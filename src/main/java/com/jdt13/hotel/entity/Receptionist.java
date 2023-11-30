@@ -1,2 +1,4 @@
-package com.jdt13.hotel.entity;public class Receptionist {
+package com.jdt13.hotel.entity;
+
+public class Receptionist {
 }
