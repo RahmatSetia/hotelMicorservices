@@ -1,4 +1,4 @@
 package com.jdt13.hotel.entity;
 
-public class JenisKasur {
+public class Checkout {
 }
