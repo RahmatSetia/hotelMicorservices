@@ -1,2 +1,4 @@
-package com.jdt13.hotel.service;public class customerService {
+package com.jdt13.hotel.service;
+
+public class CustomerService {
 }

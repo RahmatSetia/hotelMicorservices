@@ -1,2 +1,4 @@
-package com.jdt13.hotel.controller;public class customerController {
+package com.jdt13.hotel.controller;
+
+public class CustomerController {
 }

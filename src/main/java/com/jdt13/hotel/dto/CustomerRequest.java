@@ -1,2 +1,4 @@
-package com.jdt13.hotel.dto;public class CustomerRequest {
+package com.jdt13.hotel.dto;
+
+public class CustomerRequest {
 }
