@@ -11,11 +11,8 @@ import java.util.Date;
 @Data
 @Entity
 public class Checkin {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    private String nama;
     private Date tanggalCheckin;
-
 }
