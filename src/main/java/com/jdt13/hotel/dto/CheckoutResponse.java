@@ -3,7 +3,7 @@ package com.jdt13.hotel.dto;
 import lombok.Data;
 
 @Data
-public class CheckinResponse {
+public class CheckoutResponse {
 
     private Boolean statusBerhasil;
 }
