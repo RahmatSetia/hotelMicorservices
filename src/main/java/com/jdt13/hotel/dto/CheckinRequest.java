@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class CheckinRequest {
 
-
+    private Integer bookingId;
 }

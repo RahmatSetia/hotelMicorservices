@@ -33,19 +33,19 @@ public class KamarService {
         return response;
     }
 
-    public KamarResponse updateKamar(KamarRequest request){
+    public KamarResponse updateKamarIdKamar(KamarRequest request){
 
         Optional<Kamar> kamar = kamarRepository.findByNoKamar(request.getNoKamar());
 
         if (kamar.isEmpty()){
-            throw new IllegalArgumentException("Kamar sudah di booking");
+            throw new IllegalArgumentException("Kamar tidak ditemukan");
         }
             KamarResponse response = new KamarResponse();
             response.setNoKamar(request.getNoKamar());
             return response;
     }
 
-    public String deleteKamarIdKamar (Integer id){
+    public String deleteKamarIdKamar(Integer id){
 
         Optional<Kamar> kamarId = kamarRepository.findById(id);
 
