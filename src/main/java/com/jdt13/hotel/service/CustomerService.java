@@ -5,6 +5,7 @@ import com.jdt13.hotel.dto.CustomerResponse;
 import com.jdt13.hotel.dto.LoginRequest;
 import com.jdt13.hotel.dto.LoginResponse;
 import com.jdt13.hotel.entity.Customer;
+import com.jdt13.hotel.exception.ApiRequestException;
 import com.jdt13.hotel.repository.CustomerRepository;
 import com.jdt13.hotel.util.Jwt;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +41,7 @@ public class CustomerService {
         Customer c = new Customer();
         String pesan = "Customer tidak di temukan";
         if (customer.isEmpty()){
-            throw new IllegalArgumentException(pesan);
+            throw new ApiRequestException(pesan);
         }
         c.setId(customer.get().getId());
         c.setNama(customer.get().getNama());
