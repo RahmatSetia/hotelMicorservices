@@ -28,6 +28,4 @@ public class ReceptionistService {
         loginResponse.setToken(request.getPassword());
         return loginResponse;
     }
-
-    public
 }
