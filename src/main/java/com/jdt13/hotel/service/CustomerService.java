@@ -40,7 +40,7 @@ public class CustomerService {
         Optional<Customer> customer = customerRepository.findByUsernameAndPassword(request.getUsername(), request.getPassword());
         Customer c = new Customer();
         String pesan = "Customer tidak di temukan";
-        if (customer.isEmpty()){
+        if (!customer.isPresent()){
             throw new ApiRequestException(pesan);
         }
         c.setId(customer.get().getId());
@@ -55,6 +55,32 @@ public class CustomerService {
         LoginResponse response = new LoginResponse();
         response.setId(c.getId());
         response.setToken(c.getToken());
+        return response;
+    }
+
+    public CustomerResponse updateCustomer (Integer id, CustomerRequest request){
+        Optional<Customer> cu = customerRepository.findById(id);
+        String pesan = "Customer tidak di temukan";
+        if (cu.isEmpty()){
+            throw new ApiRequestException(pesan);
+        }
+        Customer c = new Customer();
+        c.setId(cu.get().getId());
+        c.setNama(request.getNama());
+        c.setUsername(request.getUsername());
+        c.setPassword(request.getPassword());
+        c.setAlamat(request.getAlamat());
+        c.setPhone(request.getPhone());
+        c.setToken(cu.get().getToken());
+        customerRepository.save(c);
+
+        CustomerResponse response = new CustomerResponse();
+        response.setId(c.getId());
+        response.setNama(c.getNama());
+        response.setUsername(c.getUsername());
+        response.setPassword(c.getPassword());
+        response.setAlamat(c.getAlamat());
+        response.setPhone(c.getPhone());
         return response;
     }
 }
