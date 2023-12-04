@@ -9,6 +9,9 @@ import java.security.Key;
 import java.util.Date;
 
 public class Jwt {
+    private Jwt() {
+        throw new IllegalStateException("Jwt class");
+    }
     public static String getToken(LoginRequest request) {
         long nowMillis = System.currentTimeMillis();
         Date now = new Date(nowMillis);
