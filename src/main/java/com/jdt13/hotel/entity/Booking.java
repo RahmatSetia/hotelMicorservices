@@ -17,10 +17,6 @@ public class Booking {
     @OneToOne
     private Kamar kamar;
     private Date tanggalBooking;
-    @OneToOne
-    private Checkin checkin;
-    @OneToOne
-    private Checkout checkout;
     private BigDecimal totalHarga;
     private Boolean statusBooking;
 }
