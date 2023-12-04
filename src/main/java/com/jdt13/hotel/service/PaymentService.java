@@ -22,10 +22,5 @@ public class PaymentService {
         PaymentResponse response = new PaymentResponse();
         response.setStatusPembayaran(payment.getStatusPembayaran());
         return response;
-
     }
-
-
-
-
 }
