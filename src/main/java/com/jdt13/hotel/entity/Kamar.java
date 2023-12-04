@@ -18,4 +18,5 @@ public class Kamar {
     private BigDecimal harga;
     private String kategori;
     private String deskripsi;
+    private boolean status;
 }
