@@ -10,13 +10,13 @@ public class CustomerRequest {
     @NotBlank(message = "Nama harus di isi")
     @NotNull(message = "Nama tidak tidak boleh Null")
     private String nama;
-    @NotBlank(message = "Password tidak boleh kosong")
+    @NotBlank(message = "Password harus di isi")
     private String password;
-    @NotBlank(message = "Username tidak boleh kosong")
+    @NotBlank(message = "Username harus di isi")
     private String username;
-    @NotBlank(message = "No handphone tidak boleh kosong")
-    @Pattern(regexp = "^\\+?[0-9]{1,13}$", message = "Format tidak Valid")
+    @NotBlank(message = "No handphone harus di isi")
+    @Pattern(regexp = "^\\+?[0-9]{1,13}$", message = "Format phone tidak Valid")
     private String phone;
-    @NotBlank(message = "alamat tidak boleh kosong")
+    @NotBlank(message = "Alamat harus di isi")
     private String alamat;
 }

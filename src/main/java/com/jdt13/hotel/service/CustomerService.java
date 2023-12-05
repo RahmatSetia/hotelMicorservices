@@ -18,6 +18,7 @@ import java.util.Optional;
 public class CustomerService {
     private final CustomerRepository customerRepository;
 
+    String idNotFound = "Customer tidak di temukan";
     public CustomerResponse registerCustomer (CustomerRequest request){
         Customer customer = new Customer();
         customer.setNama(request.getNama());
@@ -33,15 +34,16 @@ public class CustomerService {
         response.setUsername(customer.getUsername());
         response.setPassword(customer.getPassword());
         response.setPhone(customer.getPhone());
+        response.setAlamat(customer.getAlamat());
         return response;
     }
 
     public LoginResponse login (LoginRequest request){
         Optional<Customer> customer = customerRepository.findByUsernameAndPassword(request.getUsername(), request.getPassword());
         Customer c = new Customer();
-        String pesan = "Customer tidak di temukan";
-        if (customer.isEmpty()){
-            throw new ApiRequestException(pesan);
+
+        if (!customer.isPresent()){
+            throw new ApiRequestException(idNotFound);
         }
         c.setId(customer.get().getId());
         c.setNama(customer.get().getNama());
@@ -56,5 +58,48 @@ public class CustomerService {
         response.setId(c.getId());
         response.setToken(c.getToken());
         return response;
+    }
+
+    public Customer findCustomerById (Integer id){
+        Optional<Customer> cu = customerRepository.findById(id);
+        if (cu.isEmpty()){
+            throw new ApiRequestException(idNotFound);
+        }
+        return cu.get();
+    }
+
+    public CustomerResponse updateCustomer (Integer id, CustomerRequest request){
+        Optional<Customer> cu = customerRepository.findById(id);
+
+        if (cu.isEmpty()){
+            throw new ApiRequestException(idNotFound);
+        }
+        Customer c = new Customer();
+        c.setId(cu.get().getId());
+        c.setNama(request.getNama());
+        c.setUsername(request.getUsername());
+        c.setPassword(request.getPassword());
+        c.setAlamat(request.getAlamat());
+        c.setPhone(request.getPhone());
+        c.setToken(cu.get().getToken());
+        customerRepository.save(c);
+
+        CustomerResponse response = new CustomerResponse();
+        response.setId(c.getId());
+        response.setNama(c.getNama());
+        response.setUsername(c.getUsername());
+        response.setPassword(c.getPassword());
+        response.setAlamat(c.getAlamat());
+        response.setPhone(c.getPhone());
+        return response;
+    }
+
+    public void deleteCustomerById (Integer id){
+
+        Optional<Customer> customer = customerRepository.findById(id);
+        if (customer.isEmpty()){
+            throw new ApiRequestException(idNotFound);
+        }
+        customerRepository.deleteById(id);
     }
 }

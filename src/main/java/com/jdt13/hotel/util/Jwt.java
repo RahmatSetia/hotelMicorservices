@@ -19,7 +19,7 @@ public class Jwt {
         Key key = MacProvider.generateKey();
         return Jwts.builder()
                 .setSubject(String.valueOf(request))
-                .setAudience("customers")
+                .setAudience("users")
                 .setIssuedAt(now)
                 .setExpiration(expireDate)
                 .signWith(SignatureAlgorithm.HS512, key)
