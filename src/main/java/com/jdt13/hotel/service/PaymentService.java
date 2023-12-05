@@ -14,7 +14,7 @@ public class PaymentService {
 
     public PaymentResponse paymentResponse(PaymentRequest request){
         Payment payment = new Payment();
-        payment.setId(payment.getId());
+        payment.setId(request.getIdBooking());
         payment.setBooking(payment.getBooking());
         payment.setStatusPembayaran(true);
         paymentRepository.save(payment);
