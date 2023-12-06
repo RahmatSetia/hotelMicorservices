@@ -15,7 +15,7 @@ public class Kamar {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private Integer noKamar;
-    private BigDecimal haraga;
+    private BigDecimal harga;
     private String kategori;
     private String deskripsi;
     private boolean status;
