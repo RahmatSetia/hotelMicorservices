@@ -3,6 +3,7 @@ package com.jdt13.hotel.service;
 import com.jdt13.hotel.dto.KamarRequest;
 import com.jdt13.hotel.dto.KamarResponse;
 import com.jdt13.hotel.entity.Kamar;
+import com.jdt13.hotel.exception.ApiRequestException;
 import com.jdt13.hotel.repository.KamarRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ public class KamarService {
 
     private final KamarRepository kamarRepository;
 
-    public KamarResponse saveKamar(KamarRequest request){
+    public KamarResponse bookingKamar(KamarRequest request){
 
         Kamar kamar = new Kamar();
         kamar.setNoKamar(request.getNoKamar());
@@ -36,25 +37,32 @@ public class KamarService {
     public KamarResponse updateKamarIdKamar(KamarRequest request){
 
         Optional<Kamar> kamar = kamarRepository.findByNoKamar(request.getNoKamar());
+        Kamar k = new Kamar();
+        String pesan = "Kamar tidak ditemukan";
 
         if (kamar.isEmpty()){
-            throw new IllegalArgumentException("Kamar tidak ditemukan");
+            throw new ApiRequestException(pesan);
         }
-            KamarResponse response = new KamarResponse();
-            response.setNoKamar(request.getNoKamar());
-            return response;
+        k.setId(k.getId());
+        k.setNoKamar(k.getNoKamar());
+        k.setHarga(k.getHarga());
+        k.setKategori(k.getKategori());
+        k.setDeskripsi(k.getDeskripsi());
+        kamarRepository.save(k);
+
+        KamarResponse response = new KamarResponse();
+        response.setNoKamar(k.getNoKamar());
+        return response;
     }
 
-    public String deleteKamarIdKamar(Integer id){
+    public void deleteKamarIdKamar(Integer id){
 
         Optional<Kamar> kamarId = kamarRepository.findById(id);
-
-        String pesan = "";
+        String pesan = "Kamar tidak ditemukan";
 
         if (kamarId.isEmpty()){
-            throw new IllegalArgumentException("Kamar sudah di booking");
+            throw new ApiRequestException(pesan);
         }
         kamarRepository.deleteById(id);
-        return pesan;
     }
 }
