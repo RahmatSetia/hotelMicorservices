@@ -1,10 +1,8 @@
 package com.jdt13.hotel.service;
 
-import com.jdt13.hotel.dto.CustomerRequest;
-import com.jdt13.hotel.dto.CustomerResponse;
-import com.jdt13.hotel.dto.LoginRequest;
-import com.jdt13.hotel.dto.LoginResponse;
+import com.jdt13.hotel.dto.*;
 import com.jdt13.hotel.entity.Customer;
+import com.jdt13.hotel.entity.Payment;
 import com.jdt13.hotel.exception.ApiRequestException;
 import com.jdt13.hotel.repository.CustomerRepository;
 import com.jdt13.hotel.util.Jwt;
@@ -27,15 +25,7 @@ public class CustomerService {
         customer.setAlamat(request.getAlamat());
         customer.setPhone(request.getPhone());
         customerRepository.save(customer);
-
-        CustomerResponse response = new CustomerResponse();
-        response.setId(customer.getId());
-        response.setNama(customer.getNama());
-        response.setUsername(customer.getUsername());
-        response.setPassword(customer.getPassword());
-        response.setPhone(customer.getPhone());
-        response.setAlamat(customer.getAlamat());
-        return response;
+        return toPaymentResponse(customer);
     }
 
     public LoginResponse login (LoginRequest request){
@@ -60,12 +50,12 @@ public class CustomerService {
         return response;
     }
 
-    public Customer findCustomerById (Integer id){
+    public CustomerResponse findCustomerById (Integer id){
         Optional<Customer> cu = customerRepository.findById(id);
         if (cu.isEmpty()){
             throw new ApiRequestException(idNotFound);
         }
-        return cu.get();
+        return toPaymentResponse(cu.get());
     }
 
     public CustomerResponse updateCustomer (Integer id, CustomerRequest request){
@@ -83,15 +73,7 @@ public class CustomerService {
         c.setPhone(request.getPhone());
         c.setToken(cu.get().getToken());
         customerRepository.save(c);
-
-        CustomerResponse response = new CustomerResponse();
-        response.setId(c.getId());
-        response.setNama(c.getNama());
-        response.setUsername(c.getUsername());
-        response.setPassword(c.getPassword());
-        response.setAlamat(c.getAlamat());
-        response.setPhone(c.getPhone());
-        return response;
+        return toPaymentResponse(c);
     }
 
     public void deleteCustomerById (Integer id){
@@ -101,5 +83,16 @@ public class CustomerService {
             throw new ApiRequestException(idNotFound);
         }
         customerRepository.deleteById(id);
+    }
+
+    private CustomerResponse toPaymentResponse (Customer customer){
+        CustomerResponse response = new CustomerResponse();
+        response.setId(customer.getId());
+        response.setNama(customer.getNama());
+        response.setUsername(customer.getUsername());
+        response.setPassword(customer.getPassword());
+        response.setPhone(customer.getPhone());
+        response.setAlamat(customer.getAlamat());
+        return response;
     }
 }
