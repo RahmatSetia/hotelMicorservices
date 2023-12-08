@@ -1,5 +1,6 @@
 package com.jdt13.hotel.service;
 
+import com.jdt13.hotel.dto.KamarCheckinRequest;
 import com.jdt13.hotel.dto.KamarRequest;
 import com.jdt13.hotel.dto.KamarResponse;
 import com.jdt13.hotel.entity.Kamar;
@@ -9,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,8 +19,8 @@ public class KamarService {
 
     private final KamarRepository kamarRepository;
 
-    public List<Kamar> getAllKamarBeforeBooking (Date dateIn, Date dateOut){
-        return kamarRepository.findKamarBeforeBookingInCheckinCheckout(dateIn, dateOut);
+    public List<Kamar> getAllKamarBeforeBooking (KamarCheckinRequest kamarCheckinRequest){
+        return kamarRepository.findKamarBeforeBookingInCheckinCheckout(kamarCheckinRequest.getCheckin(), kamarCheckinRequest.getCheckout());
     }
 
     public KamarResponse saveKamar(KamarRequest request){
@@ -30,13 +30,7 @@ public class KamarService {
         kamar.setKategori(request.getKategori());
         kamar.setDeskripsi(request.getDeskripsi());
         kamarRepository.save(kamar);
-
-        KamarResponse response = new KamarResponse();
-        response.setNoKamar(kamar.getNoKamar());
-        response.setHarga(kamar.getHarga().doubleValue());
-        response.setKategori(kamar.getKategori());
-        response.setDeskripsi(kamar.getDeskripsi());
-        return response;
+        return toResponseKamar(kamar);
     }
 
     public KamarResponse updateKamarById (Integer id, KamarRequest request){
@@ -52,23 +46,25 @@ public class KamarService {
         kamar.setKategori(request.getKategori());
         kamar.setDeskripsi(request.getDeskripsi());
         kamarRepository.save(kamar);
-
-        KamarResponse response = new KamarResponse();
-        response.setId(kamar.getId());
-        response.setNoKamar(request.getNoKamar());
-        response.setHarga(request.getHarga());
-        response.setKategori(request.getKategori());
-        response.setDeskripsi(request.getDeskripsi());
-        return response;
+        return toResponseKamar(kamar);
     }
 
-    public String deleteKamarIdKamar(Integer id){
+    public void deleteKamarIdKamar(Integer id){
         Optional<Kamar> kamarId = kamarRepository.findById(id);
         String pesan = "Id kamar tidak di temukan";
         if (kamarId.isEmpty()){
             throw new ApiRequestException(pesan);
         }
         kamarRepository.deleteById(id);
-        return pesan;
+    }
+
+    private KamarResponse toResponseKamar (Kamar kamar){
+        KamarResponse response = new KamarResponse();
+        response.setId(kamar.getId());
+        response.setNoKamar(kamar.getNoKamar());
+        response.setHarga(kamar.getHarga().doubleValue());
+        response.setKategori(kamar.getKategori());
+        response.setDeskripsi(kamar.getDeskripsi());
+        return response;
     }
 }
