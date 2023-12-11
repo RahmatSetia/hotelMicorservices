@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -14,8 +15,10 @@ public class Booking {
     private Integer id;
     @ManyToOne
     private Customer customer;
-    @OneToOne
+    @ManyToOne
     private Kamar kamar;
+    private Date checkin;
+    private Date checkout;
     private Date tanggalBooking;
     private BigDecimal totalHarga;
     private Boolean statusBooking;

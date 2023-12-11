@@ -12,7 +12,10 @@ import com.jdt13.hotel.repository.KamarRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,13 +24,14 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final CustomerRepository customerRepository;
     private final KamarRepository kamarRepository;
+    private final PaymentService paymentService;
     private final TokenService tokenService;
 
-    public BookingResponse addBooking (String token, BookingRequest request){
-        //id customer dari token sesudah login
-        Integer idCust = tokenService.findCustomer(token);
-        //logic for harga
-        BigDecimal hargaTambahan = new BigDecimal(20000);
+    public BookingResponse addBooking (BookingRequest request){
+        DateFormat dateFormat = new  SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Date now = new Date();
+//        String token = "token";
+//        Customer idCust = tokenService.findCustomer(token);
 
         Optional<Customer> customer = customerRepository.findById(request.getCustomerId());
         if (customer.isEmpty()){
@@ -42,19 +46,27 @@ public class BookingService {
         Booking booking = new Booking();
         booking.setCustomer(customer.get());
         booking.setKamar(kamar.get());
-        booking.setTanggalBooking(request.getTanggalBooking());
-        booking.setTotalHarga(kamar.get().getHarga().add(hargaTambahan));
+        booking.setTanggalBooking(new Date());
+        booking.setCheckin(request.getCheckin());
+        booking.setCheckout(request.getCheckout());
+        booking.setTotalHarga(kamar.get().getHarga());
         booking.setStatusBooking(false);
         bookingRepository.save(booking);
+        paymentService.addPayment(booking);
+        return mapToBookingResponse(booking);
+    }
 
-        BookingResponse response = new BookingResponse();
-        response.setId(booking.getId());
-        response.setCustomerId(booking.getCustomer().getId());
-        response.setKamarId(booking.getKamar().getId());
-        response.setTanggalBooking(booking.getTanggalBooking());
-        response.setTotalHarga(booking.getTotalHarga());
-        response.setStatusBooking(booking.getStatusBooking());
-        return response;
+    public BookingResponse getBookingById (Integer id){
+        Optional<Booking> booking = bookingRepository.findById(id);
+        if (booking.isEmpty()){
+            throw new ApiRequestException("Id Booking tidak di temukan");
+        }
+        return mapToBookingResponse(booking.get());
+    }
+
+    public List<BookingResponse> getAllBooking (){
+        List<Booking> allBooking = bookingRepository.findAll();
+        return allBooking.stream().map(this::mapToBookingResponse).toList();
     }
 
     public void deleteBookingById (Integer id){
@@ -63,5 +75,16 @@ public class BookingService {
             throw new ApiRequestException("Id Booking tidak di temukan");
         }
         bookingRepository.deleteById(id);
+    }
+    private BookingResponse mapToBookingResponse(Booking booking) {
+        BookingResponse bookingResponse = new BookingResponse();
+        bookingResponse.setId(booking.getId());
+        bookingResponse.setCustomerId(booking.getCustomer().getId());
+        bookingResponse.setKamarId(booking.getKamar().getId());
+        bookingResponse.setCheckin(booking.getCheckin());
+        bookingResponse.setCheckout(booking.getCheckout());
+        bookingResponse.setTotalHarga(booking.getTotalHarga());
+        bookingResponse.setStatusBooking(booking.getStatusBooking());
+        return bookingResponse;
     }
 }
