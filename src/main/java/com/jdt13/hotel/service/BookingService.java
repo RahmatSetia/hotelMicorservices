@@ -29,6 +29,7 @@ public class BookingService {
     private final TokenService tokenService;
 
     private String pesan = "Id booking tidak di temukan";
+    private String pesanCustomer = "Id customer tidak di temukan";
     private String tokenNotFound = "Anda belum login";
     public BookingResponse addBooking (String token, BookingRequest request){
         if (!tokenService.getToken(token)){throw new ApiRequestException(tokenNotFound);}
@@ -59,7 +60,7 @@ public class BookingService {
     //reportBookingByCustomerId
     public List<BookingResponse> getBookingByCustomerId (Integer id){
         List<Booking> booking = bookingRepository.customerId(id);
-        if (booking.isEmpty()){throw new ApiRequestException(pesan);}
+        if (booking.isEmpty()){throw new ApiRequestException(pesanCustomer);}
         return booking.stream().map(this::mapToBookingResponse).toList();
     }
 
@@ -81,12 +82,12 @@ public class BookingService {
         if (booking.get().getStatusBooking().booleanValue()){throw new ApiRequestException("Booking status sudah true");}
         Booking book = new Booking();
         book.setId(id);
-        book.setCustomer(book.getCustomer());
-        book.setKamar(book.getKamar());
-        book.setCheckin(book.getCheckin());
-        book.setCheckout(book.getCheckout());
-        book.setTanggalBooking(book.getTanggalBooking());
-        book.setTotalHarga(book.getTotalHarga());
+        book.setCustomer(booking.get().getCustomer());
+        book.setKamar(booking.get().getKamar());
+        book.setCheckin(booking.get().getCheckin());
+        book.setCheckout(booking.get().getCheckout());
+        book.setTanggalBooking(booking.get().getTanggalBooking());
+        book.setTotalHarga(booking.get().getTotalHarga());
         book.setStatusBooking(true);
         bookingRepository.save(book);
         return mapToBookingResponse(book);
@@ -98,12 +99,12 @@ public class BookingService {
         if (booking.isEmpty()){throw new ApiRequestException(pesan);}
         Booking book = new Booking();
         book.setId(id);
-        book.setCustomer(book.getCustomer());
-        book.setKamar(book.getKamar());
-        book.setCheckin(book.getCheckin());
-        book.setCheckout(book.getCheckout());
-        book.setTanggalBooking(book.getTanggalBooking());
-        book.setTotalHarga(book.getTotalHarga());
+        book.setCustomer(booking.get().getCustomer());
+        book.setKamar(booking.get().getKamar());
+        book.setCheckin(booking.get().getCheckin());
+        book.setCheckout(booking.get().getCheckout());
+        book.setTanggalBooking(booking.get().getTanggalBooking());
+        book.setTotalHarga(booking.get().getTotalHarga());
         book.setStatusBooking(null);
         bookingRepository.save(book);
         return mapToBookingResponse(book);
