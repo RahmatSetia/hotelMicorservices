@@ -4,7 +4,6 @@ import com.jdt13.hotel.dto.CustomerRequest;
 import com.jdt13.hotel.dto.CustomerResponse;
 import com.jdt13.hotel.dto.LoginRequest;
 import com.jdt13.hotel.dto.LoginResponse;
-import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

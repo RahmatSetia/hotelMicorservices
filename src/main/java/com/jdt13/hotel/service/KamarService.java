@@ -19,8 +19,15 @@ public class KamarService {
 
     private final KamarRepository kamarRepository;
 
+    private String pesan = "Kamar tidak di temukan";
+
     public List<Kamar> getAllKamarBeforeBooking (KamarCheckinRequest kamarCheckinRequest){
         return kamarRepository.findKamarBeforeBookingInCheckinCheckout(kamarCheckinRequest.getCheckin(), kamarCheckinRequest.getCheckout());
+    }
+
+    public List<KamarResponse> getAllKamar (){
+        List<Kamar> kamars = kamarRepository.findAll();
+        return kamars.stream().map(this::toResponseKamar).toList();
     }
 
     public KamarResponse saveKamar(KamarRequest request){
@@ -34,11 +41,8 @@ public class KamarService {
     }
 
     public KamarResponse updateKamarById (Integer id, KamarRequest request){
-        String pesan = "Kamar tidak di temukan";
         Optional<Kamar> k = kamarRepository.findById(id);
-        if (k.isEmpty()){
-            throw new ApiRequestException(pesan);
-        }
+        if (k.isEmpty()){throw new ApiRequestException(pesan);}
         Kamar kamar = new Kamar();
         kamar.setId(k.get().getId());
         kamar.setNoKamar(request.getNoKamar());
@@ -51,10 +55,7 @@ public class KamarService {
 
     public void deleteKamarIdKamar(Integer id){
         Optional<Kamar> kamarId = kamarRepository.findById(id);
-        String pesan = "Id kamar tidak di temukan";
-        if (kamarId.isEmpty()){
-            throw new ApiRequestException(pesan);
-        }
+        if (kamarId.isEmpty()){throw new ApiRequestException(pesan);}
         kamarRepository.deleteById(id);
     }
 

@@ -21,11 +21,11 @@ public class TokenService {
         return getToken.isPresent();
     }
 
-    public Integer findCustomer(String token){
+    public Customer findCustomer(String token){
         Optional<Customer> getCustomer = customerRepository.findByToken(token);
         if (getCustomer.isEmpty()){
             throw new ApiRequestException("Token tidak di temukan");
         }
-        return getCustomer.get().getId();
+        return getCustomer.get();
     }
 }

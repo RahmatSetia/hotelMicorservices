@@ -2,6 +2,7 @@ package com.jdt13.hotel.service;
 
 import com.jdt13.hotel.dto.BookingRequest;
 import com.jdt13.hotel.dto.BookingResponse;
+import com.jdt13.hotel.dto.ReportRequest;
 import com.jdt13.hotel.entity.Booking;
 import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.entity.Kamar;
@@ -27,6 +28,8 @@ public class BookingService {
     private final PaymentService paymentService;
     private final TokenService tokenService;
 
+    private String pesan = "Id booking tidak di temukan";
+
     public BookingResponse addBooking (BookingRequest request){
         DateFormat dateFormat = new  SimpleDateFormat("yyyy-MM-dd HH:mm");
         Date now = new Date();
@@ -34,14 +37,9 @@ public class BookingService {
 //        Customer idCust = tokenService.findCustomer(token);
 
         Optional<Customer> customer = customerRepository.findById(request.getCustomerId());
-        if (customer.isEmpty()){
-            throw new ApiRequestException("Id Customer tidak di temukan");
-        }
-
+        if (customer.isEmpty()){throw new ApiRequestException("Id Customer tidak di temukan");}
         Optional<Kamar> kamar = kamarRepository.findById(request.getKamarId());
-        if (kamar.isEmpty()){
-            throw new ApiRequestException("Id Kamar tidak di temukan");
-        }
+        if (kamar.isEmpty()){throw new ApiRequestException("Id Kamar tidak di temukan");}
 
         Booking booking = new Booking();
         booking.setCustomer(customer.get());
@@ -58,9 +56,7 @@ public class BookingService {
 
     public BookingResponse getBookingById (Integer id){
         Optional<Booking> booking = bookingRepository.findById(id);
-        if (booking.isEmpty()){
-            throw new ApiRequestException("Id Booking tidak di temukan");
-        }
+        if (booking.isEmpty()){throw new ApiRequestException(pesan);}
         return mapToBookingResponse(booking.get());
     }
 
@@ -71,11 +67,62 @@ public class BookingService {
 
     public void deleteBookingById (Integer id){
         Optional<Booking> booking = bookingRepository.findById(id);
-        if (booking.isEmpty()){
-            throw new ApiRequestException("Id Booking tidak di temukan");
-        }
+        if (booking.isEmpty()){throw new ApiRequestException(pesan);}
         bookingRepository.deleteById(id);
     }
+
+    //accCheckin
+    public BookingResponse checkinBooking (Integer id){
+        Optional<Booking> booking = bookingRepository.findById(id);
+        if (booking.isEmpty()){throw new ApiRequestException(pesan);}
+        if (booking.get().getStatusBooking().booleanValue()){throw new ApiRequestException("Booking status sudah true");}
+        Booking book = new Booking();
+        book.setId(id);
+        book.setCustomer(book.getCustomer());
+        book.setKamar(book.getKamar());
+        book.setCheckin(book.getCheckin());
+        book.setCheckout(book.getCheckout());
+        book.setTanggalBooking(book.getTanggalBooking());
+        book.setTotalHarga(book.getTotalHarga());
+        book.setStatusBooking(true);
+        bookingRepository.save(book);
+        return mapToBookingResponse(book);
+    }
+
+    //accCheckout
+    public BookingResponse checkoutBooking (Integer id){
+        Optional<Booking> booking = bookingRepository.findById(id);
+        if (booking.isEmpty()){throw new ApiRequestException(pesan);}
+        Booking book = new Booking();
+        book.setId(id);
+        book.setCustomer(book.getCustomer());
+        book.setKamar(book.getKamar());
+        book.setCheckin(book.getCheckin());
+        book.setCheckout(book.getCheckout());
+        book.setTanggalBooking(book.getTanggalBooking());
+        book.setTotalHarga(book.getTotalHarga());
+        book.setStatusBooking(null);
+        bookingRepository.save(book);
+        return mapToBookingResponse(book);
+    }
+
+    public List<BookingResponse> allBookingStatusFalse(){
+        List<Booking> booking = bookingRepository.statusBookingFalse();
+        return booking.stream().map(this::mapToBookingResponse).toList();
+    }
+    public List<BookingResponse> allBookingStatusTrue(){
+        List<Booking> booking = bookingRepository.statusBookingTrue();
+        return booking.stream().map(this::mapToBookingResponse).toList();
+    }
+    public List<BookingResponse> allBookingStatusNull(){
+        List<Booking> booking = bookingRepository.statusBookingNull();
+        return booking.stream().map(this::mapToBookingResponse).toList();
+    }
+    public List<BookingResponse> reportByMonth(ReportRequest request){
+        List<Booking> bookings = bookingRepository.reportByDate(request.getStartDay(), request.getEndDay());
+        return bookings.stream().map(this::mapToBookingResponse).toList();
+    }
+
     private BookingResponse mapToBookingResponse(Booking booking) {
         BookingResponse bookingResponse = new BookingResponse();
         bookingResponse.setId(booking.getId());
