@@ -21,8 +21,8 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<CustomerResponse> getCustomerById (@PathVariable("id") Integer id){
-        CustomerResponse response = customerService.findCustomerById(id);
+    public ResponseEntity<Customer> getCustomerById (@PathVariable("id") Integer id){
+        Customer response = customerService.findCustomerById(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

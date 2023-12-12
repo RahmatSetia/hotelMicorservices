@@ -23,9 +23,9 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-//    @PostMapping
-//    public ResponseEntity<PaymentResponse> paymentCustomer (@Valid @RequestBody PaymentRequest paymentRequest){
-//        PaymentResponse response = paymentService.paymentResponse(paymentRequest);
-//        return  new ResponseEntity<>(response, HttpStatus.CREATED);
-//    }
+    @PostMapping
+    public ResponseEntity<PaymentResponse> paymentCustomer (@Valid @RequestBody PaymentRequest paymentRequest){
+        PaymentResponse response = paymentService.paymentResponse(paymentRequest);
+        return  new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 }
