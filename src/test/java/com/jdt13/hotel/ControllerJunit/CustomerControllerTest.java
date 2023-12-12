@@ -2,6 +2,7 @@ package com.jdt13.hotel.ControllerJunit;
 
 import com.jdt13.hotel.controller.CustomerController;
 import com.jdt13.hotel.dto.CustomerRequest;
+import com.jdt13.hotel.dto.CustomerResponse;
 import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.service.CustomerService;
 import org.hibernate.service.spi.ServiceException;
@@ -34,9 +35,11 @@ public class CustomerControllerTest {
         int validCustomerId = 1;
         Customer mockCustomer = new Customer();
         mockCustomer.setId(validCustomerId);
-        when(customerService.findCustomerById(validCustomerId)).thenReturn(mockCustomer);
 
-        ResponseEntity<Customer> responseEntity = customerController.getCustomerById(validCustomerId);
+        CustomerResponse response = new CustomerResponse();
+        when(customerService.findCustomerById(validCustomerId)).thenReturn(response);
+
+        ResponseEntity<CustomerResponse> responseEntity = customerController.getCustomerById(validCustomerId);
 
         assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
         assertEquals(responseEntity.getBody().getId(), validCustomerId);
@@ -47,9 +50,11 @@ public class CustomerControllerTest {
         int invalidCustomerId = 99; // Assuming this product doesn't exist
         Customer mockCustomer = new Customer();
         mockCustomer.setId(invalidCustomerId);
-        when(customerService.findCustomerById(invalidCustomerId)).thenReturn(mockCustomer);
 
-        ResponseEntity<Customer> responseEntity = customerController.getCustomerById(invalidCustomerId);
+        CustomerResponse response = new CustomerResponse();
+        when(customerService.findCustomerById(invalidCustomerId)).thenReturn(response);
+
+        ResponseEntity<CustomerResponse> responseEntity = customerController.getCustomerById(invalidCustomerId);
 
         assertEquals(responseEntity.getStatusCode(), HttpStatus.NOT_FOUND);
     }
@@ -59,9 +64,11 @@ public class CustomerControllerTest {
         int validCustomerId = 1;
         Customer mockCustomer = new Customer();
         mockCustomer.setId(validCustomerId); // Assuming this ID exists
-        when(customerService.findCustomerById(validCustomerId)).thenReturn(mockCustomer);
 
-        ResponseEntity<Customer> responseEntity = customerController.getCustomerById(validCustomerId);
+        CustomerResponse response = new CustomerResponse();
+        when(customerService.findCustomerById(validCustomerId)).thenReturn(response);
+
+        ResponseEntity<CustomerResponse> responseEntity = customerController.getCustomerById(validCustomerId);
 
         assertEquals(responseEntity.getStatusCode(), HttpStatus.CREATED);
         assertEquals(responseEntity.getBody().getId(), validCustomerId);
