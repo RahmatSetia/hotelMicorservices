@@ -15,7 +15,7 @@ public class CustomerRequest {
     @NotBlank(message = "Username harus di isi")
     private String username;
     @NotBlank(message = "No handphone harus di isi")
-    @Pattern(regexp = "^\\+?\\d{1,13}$", message = "Format phone tidak Valid")
+    @Pattern(regexp = "^\\+?[0-9]{1,13}$", message = "Format phone tidak Valid")
     private String phone;
     @NotBlank(message = "Alamat harus di isi")
     private String alamat;

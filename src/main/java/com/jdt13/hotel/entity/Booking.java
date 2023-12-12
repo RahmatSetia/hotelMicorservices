@@ -14,10 +14,8 @@ public class Booking {
     private Integer id;
     @ManyToOne
     private Customer customer;
-    @ManyToOne
+    @OneToOne
     private Kamar kamar;
-    private Date checkin;
-    private Date checkout;
     private Date tanggalBooking;
     private BigDecimal totalHarga;
     private Boolean statusBooking;
