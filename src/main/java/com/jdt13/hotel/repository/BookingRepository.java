@@ -14,6 +14,7 @@ public interface BookingRepository extends JpaRepository <Booking, Integer> {
     List<Booking> statusBookingFalse();
     List<Booking> statusBookingTrue();
     List<Booking> statusBookingNull();
+    List<Booking> customerId(Integer id);
     @Query("Select b From Booking b " +
             "where b.checkin >= :dayStart " +
             "And b.checkout <= :dayEnd")

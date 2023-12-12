@@ -26,6 +26,12 @@ public class BookingController {
         return new ResponseEntity<>(getAll, HttpStatus.OK);
     }
 
+    @GetMapping("/customer/{id}")
+    public ResponseEntity<List<BookingResponse>> getAllBookingByCustomerId (@PathVariable("id") Integer id){
+        List<BookingResponse> getAllById = bookingService.getBookingByCustomerId(id);
+        return new ResponseEntity<>(getAllById, HttpStatus.OK);
+    }
+
     @GetMapping("/false")
     public ResponseEntity<List<BookingResponse>> getAllBookingStatusFalse(){
         List<BookingResponse> allBookingFalse = bookingService.allBookingStatusFalse();
@@ -57,8 +63,8 @@ public class BookingController {
     }
 
     @PostMapping
-    public ResponseEntity<BookingResponse> addBooking (@Valid @RequestBody BookingRequest request){
-        BookingResponse response = bookingService.addBooking(request);
+    public ResponseEntity<BookingResponse> addBooking ( @RequestHeader String token, @Valid @RequestBody BookingRequest request){
+        BookingResponse response = bookingService.addBooking(token, request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

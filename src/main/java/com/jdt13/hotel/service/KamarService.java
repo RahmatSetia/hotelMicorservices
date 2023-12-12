@@ -18,14 +18,17 @@ import java.util.Optional;
 public class KamarService {
 
     private final KamarRepository kamarRepository;
+    private final TokenService tokenService;
 
     private String pesan = "Kamar tidak di temukan";
+    private String tokenNotFound = "Anda belum login";
 
     public List<Kamar> getAllKamarBeforeBooking (KamarCheckinRequest kamarCheckinRequest){
         return kamarRepository.findKamarBeforeBookingInCheckinCheckout(kamarCheckinRequest.getCheckin(), kamarCheckinRequest.getCheckout());
     }
 
-    public List<KamarResponse> getAllKamar (){
+    public List<KamarResponse> getAllKamar (String token){
+        if (!tokenService.getToken(token)){throw new ApiRequestException(tokenNotFound);}
         List<Kamar> kamars = kamarRepository.findAll();
         return kamars.stream().map(this::toResponseKamar).toList();
     }

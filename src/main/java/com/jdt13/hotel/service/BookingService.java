@@ -29,13 +29,9 @@ public class BookingService {
     private final TokenService tokenService;
 
     private String pesan = "Id booking tidak di temukan";
-
-    public BookingResponse addBooking (BookingRequest request){
-        DateFormat dateFormat = new  SimpleDateFormat("yyyy-MM-dd HH:mm");
-        Date now = new Date();
-//        String token = "token";
-//        Customer idCust = tokenService.findCustomer(token);
-
+    private String tokenNotFound = "Anda belum login";
+    public BookingResponse addBooking (String token, BookingRequest request){
+        if (!tokenService.getToken(token)){throw new ApiRequestException(tokenNotFound);}
         Optional<Customer> customer = customerRepository.findById(request.getCustomerId());
         if (customer.isEmpty()){throw new ApiRequestException("Id Customer tidak di temukan");}
         Optional<Kamar> kamar = kamarRepository.findById(request.getKamarId());
@@ -58,6 +54,13 @@ public class BookingService {
         Optional<Booking> booking = bookingRepository.findById(id);
         if (booking.isEmpty()){throw new ApiRequestException(pesan);}
         return mapToBookingResponse(booking.get());
+    }
+
+    //reportBookingByCustomerId
+    public List<BookingResponse> getBookingByCustomerId (Integer id){
+        List<Booking> booking = bookingRepository.customerId(id);
+        if (booking.isEmpty()){throw new ApiRequestException(pesan);}
+        return booking.stream().map(this::mapToBookingResponse).toList();
     }
 
     public List<BookingResponse> getAllBooking (){

@@ -14,8 +14,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CustomerService {
     private final CustomerRepository customerRepository;
+    private final TokenService tokenService;
 
-    String idNotFound = "Customer tidak di temukan";
+    private String idNotFound = "Customer tidak di temukan";
+    private String tokenNotFound = "Anda belum login";
     public CustomerResponse registerCustomer (CustomerRequest request){
         Customer customer = new Customer();
         customer.setNama(request.getNama());
@@ -30,10 +32,7 @@ public class CustomerService {
     public LoginResponse login (LoginRequest request){
         Optional<Customer> customer = customerRepository.findByUsernameAndPassword(request.getUsername(), request.getPassword());
         Customer c = new Customer();
-
-        if (!customer.isPresent()){
-            throw new ApiRequestException(idNotFound);
-        }
+        if (!customer.isPresent()){throw new ApiRequestException(idNotFound);}
         c.setId(customer.get().getId());
         c.setNama(customer.get().getNama());
         c.setUsername(customer.get().getUsername());
@@ -49,7 +48,8 @@ public class CustomerService {
         return response;
     }
 
-    public CustomerResponse findCustomerById (Integer id){
+    public CustomerResponse findCustomerById (Integer id, String token){
+        if (!tokenService.getToken(token)){throw new ApiRequestException(tokenNotFound);}
         Optional<Customer> cu = customerRepository.findById(id);
         if (cu.isEmpty()){
             throw new ApiRequestException(idNotFound);
@@ -57,9 +57,9 @@ public class CustomerService {
         return toPaymentResponse(cu.get());
     }
 
-    public CustomerResponse updateCustomer (Integer id, CustomerRequest request){
+    public CustomerResponse updateCustomer (String token, Integer id, CustomerRequest request){
+        if (!tokenService.getToken(token)){throw new ApiRequestException(tokenNotFound);}
         Optional<Customer> cu = customerRepository.findById(id);
-
         if (cu.isEmpty()){
             throw new ApiRequestException(idNotFound);
         }
@@ -76,7 +76,6 @@ public class CustomerService {
     }
 
     public void deleteCustomerById (Integer id){
-
         Optional<Customer> customer = customerRepository.findById(id);
         if (customer.isEmpty()){
             throw new ApiRequestException(idNotFound);

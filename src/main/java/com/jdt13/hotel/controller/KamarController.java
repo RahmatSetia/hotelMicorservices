@@ -21,9 +21,9 @@ import java.util.List;
 public class KamarController {
     private final KamarService kamarService;
 
-    @GetMapping
-    public ResponseEntity<List<KamarResponse>> getAllKamar(){
-        List<KamarResponse> kamars = kamarService.getAllKamar();
+    @GetMapping("/all")
+    public ResponseEntity<List<KamarResponse>> getAllKamar(@RequestHeader String token){
+        List<KamarResponse> kamars = kamarService.getAllKamar(token);
         return new ResponseEntity<>(kamars, HttpStatus.OK);
     }
 
