@@ -51,7 +51,6 @@ public class BookingServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    //addBookingPositive
     @Test
     void addBoking_PositiveCase(){
         Date date = new Date();
@@ -102,6 +101,43 @@ public class BookingServiceTest {
         BookingResponse response = bookingService.addBooking("token", request);
 
         assertEquals(response.getCustomerId(), idCust);
+    }
+
+    @Test
+    void addBoking_InvalidToken(){
+        String pesan = "Anda belum login";
+        BookingRequest request = new BookingRequest();
+        when(tokenService.getToken(any())).thenReturn(false);
+        ApiRequestException exception = assertThrows(ApiRequestException.class, ()-> bookingService.addBooking("token", request));
+        assertEquals(pesan, exception.getMessage());
+    }
+
+    @Test
+    void addBoking_CustomerIsEmpety(){
+        String pesanCustomer = "Id customer tidak di temukan";
+        BookingRequest request = new BookingRequest();
+        when(tokenService.getToken("token")).thenReturn(true);
+        when(customerRepository.findById(any())).thenReturn(Optional.empty());
+        ApiRequestException exception = assertThrows(ApiRequestException.class, ()-> bookingService.addBooking("token", request));
+        assertEquals(pesanCustomer, exception.getMessage());
+    }
+
+    @Test
+    void addBoking_KamarIsEmpety(){
+        String pesan = "Id Kamar tidak di temukan";
+        Customer customer = new Customer();
+        customer.setId(23);
+        customer.setNama("awang");
+        customer.setUsername("awang");
+        customer.setPassword("awang");
+        customer.setAlamat("sidareja");
+        customer.setPhone("0895339042072");
+        BookingRequest request = new BookingRequest();
+        when(tokenService.getToken("token")).thenReturn(true);
+        when(customerRepository.findById(any())).thenReturn(Optional.of(customer));
+        when(kamarRepository.findById(any())).thenReturn(Optional.empty());
+        ApiRequestException exception = assertThrows(ApiRequestException.class, ()-> bookingService.addBooking("token", request));
+        assertEquals(pesan, exception.getMessage());
     }
     //addBookingNegative
 

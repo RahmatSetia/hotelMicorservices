@@ -34,7 +34,7 @@ public class BookingService {
     public BookingResponse addBooking (String token, BookingRequest request){
         if (!tokenService.getToken(token)){throw new ApiRequestException(tokenNotFound);}
         Optional<Customer> customer = customerRepository.findById(request.getCustomerId());
-        if (customer.isEmpty()){throw new ApiRequestException("Id Customer tidak di temukan");}
+        if (customer.isEmpty()){throw new ApiRequestException(pesanCustomer);}
         Optional<Kamar> kamar = kamarRepository.findById(request.getKamarId());
         if (kamar.isEmpty()){throw new ApiRequestException("Id Kamar tidak di temukan");}
 
