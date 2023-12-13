@@ -15,7 +15,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PaymentService {
     private final PaymentRepository paymentRepository;
-    String pesan = "Id Payment tidak di temukan";
+    private String pesan = "Id Payment tidak di temukan";
     public PaymentResponse addPayment(Booking request){
         Payment payment = new Payment();
         payment.setBooking(request);

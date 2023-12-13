@@ -6,15 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface KamarRepository extends JpaRepository<Kamar, Integer> {
-
-    Optional<Kamar> findByNoKamar(Integer noKamar);
     @Query("SELECT k " +
             "FROM Booking b " +
             "RIGHT JOIN b.kamar k " +

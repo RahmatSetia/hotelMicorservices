@@ -18,15 +18,25 @@ import java.util.Optional;
 public class KamarService {
 
     private final KamarRepository kamarRepository;
+    private final TokenService tokenService;
+
+    private String pesan = "Kamar tidak di temukan";
+    private String tokenNotFound = "Anda belum login";
 
     public List<Kamar> getAllKamarBeforeBooking (KamarCheckinRequest kamarCheckinRequest){
         return kamarRepository.findKamarBeforeBookingInCheckinCheckout(kamarCheckinRequest.getCheckin(), kamarCheckinRequest.getCheckout());
     }
 
+    public List<KamarResponse> getAllKamar (String token){
+        if (!tokenService.getToken(token)){throw new ApiRequestException(tokenNotFound);}
+        List<Kamar> kamars = kamarRepository.findAll();
+        return kamars.stream().map(this::toResponseKamar).toList();
+    }
+
     public KamarResponse saveKamar(KamarRequest request){
         Kamar kamar = new Kamar();
         kamar.setNoKamar(request.getNoKamar());
-        kamar.setHarga(BigDecimal.valueOf(request.getHarga()));
+        kamar.setHarga(request.getHarga());
         kamar.setKategori(request.getKategori());
         kamar.setDeskripsi(request.getDeskripsi());
         kamarRepository.save(kamar);
@@ -34,35 +44,31 @@ public class KamarService {
     }
 
     public KamarResponse updateKamarById (Integer id, KamarRequest request){
-        String pesan = "Kamar tidak di temukan";
         Optional<Kamar> k = kamarRepository.findById(id);
-        if (k.isEmpty()){
-            throw new ApiRequestException(pesan);
-        }
+        if (k.isEmpty()){throw new ApiRequestException(pesan);}
         Kamar kamar = new Kamar();
         kamar.setId(k.get().getId());
         kamar.setNoKamar(request.getNoKamar());
-        kamar.setHarga(BigDecimal.valueOf(request.getHarga()));
+        kamar.setHarga(request.getHarga());
         kamar.setKategori(request.getKategori());
         kamar.setDeskripsi(request.getDeskripsi());
         kamarRepository.save(kamar);
         return toResponseKamar(kamar);
     }
 
-    public void deleteKamarIdKamar(Integer id){
+    public String deleteKamarIdKamar(Integer id){
+        String ok = "behasil delete Kamar dengan idBooking = " + id;
         Optional<Kamar> kamarId = kamarRepository.findById(id);
-        String pesan = "Id kamar tidak di temukan";
-        if (kamarId.isEmpty()){
-            throw new ApiRequestException(pesan);
-        }
+        if (kamarId.isEmpty()){throw new ApiRequestException(pesan);}
         kamarRepository.deleteById(id);
+        return ok;
     }
 
     private KamarResponse toResponseKamar (Kamar kamar){
         KamarResponse response = new KamarResponse();
         response.setId(kamar.getId());
         response.setNoKamar(kamar.getNoKamar());
-        response.setHarga(kamar.getHarga().doubleValue());
+        response.setHarga(kamar.getHarga());
         response.setKategori(kamar.getKategori());
         response.setDeskripsi(kamar.getDeskripsi());
         return response;

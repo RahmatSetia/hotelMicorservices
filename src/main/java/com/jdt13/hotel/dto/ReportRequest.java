@@ -6,9 +6,9 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class KamarCheckinRequest {
+public class ReportRequest {
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date checkin;
+    Date startDay;
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date checkout;
+    Date endDay;
 }
