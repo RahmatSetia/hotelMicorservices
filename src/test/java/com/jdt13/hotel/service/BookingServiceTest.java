@@ -25,7 +25,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class BookingServiceTest {
     @InjectMocks
@@ -289,7 +289,25 @@ class BookingServiceTest {
     }
 
     //deleteById
-    //cehekin
+    @Test
+    void deleteById_PositiveCase(){
+        Integer id = 1;
+        Booking booking = new Booking();
+        String ok = "behasil delete Booking dengan idBooking = " + id;
+        when(bookingRepository.findById(id)).thenReturn(Optional.of(booking));
+        String responseDelete = bookingService.deleteBookingById(id);
+        assertEquals(ok, responseDelete);
+    }
+
+    @Test
+    void deleteById_NegativeCase(){
+        Integer id = 1;
+        String pesan = "Id booking tidak di temukan";
+        when(bookingRepository.findById(id)).thenReturn(Optional.empty());
+        ApiRequestException exception = assertThrows(ApiRequestException.class, () -> bookingService.deleteBookingById(id));
+        assertEquals(pesan, exception.getMessage());
+    }
+
     @Test
     void CheckinBooking_NegativeBookingEmpety(){
         Integer fakeId = 132;

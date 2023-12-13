@@ -36,7 +36,7 @@ public class KamarService {
     public KamarResponse saveKamar(KamarRequest request){
         Kamar kamar = new Kamar();
         kamar.setNoKamar(request.getNoKamar());
-        kamar.setHarga(BigDecimal.valueOf(request.getHarga()));
+        kamar.setHarga(request.getHarga());
         kamar.setKategori(request.getKategori());
         kamar.setDeskripsi(request.getDeskripsi());
         kamarRepository.save(kamar);
@@ -49,24 +49,26 @@ public class KamarService {
         Kamar kamar = new Kamar();
         kamar.setId(k.get().getId());
         kamar.setNoKamar(request.getNoKamar());
-        kamar.setHarga(BigDecimal.valueOf(request.getHarga()));
+        kamar.setHarga(request.getHarga());
         kamar.setKategori(request.getKategori());
         kamar.setDeskripsi(request.getDeskripsi());
         kamarRepository.save(kamar);
         return toResponseKamar(kamar);
     }
 
-    public void deleteKamarIdKamar(Integer id){
+    public String deleteKamarIdKamar(Integer id){
+        String ok = "behasil delete Kamar dengan idBooking = " + id;
         Optional<Kamar> kamarId = kamarRepository.findById(id);
         if (kamarId.isEmpty()){throw new ApiRequestException(pesan);}
         kamarRepository.deleteById(id);
+        return ok;
     }
 
     private KamarResponse toResponseKamar (Kamar kamar){
         KamarResponse response = new KamarResponse();
         response.setId(kamar.getId());
         response.setNoKamar(kamar.getNoKamar());
-        response.setHarga(kamar.getHarga().doubleValue());
+        response.setHarga(kamar.getHarga());
         response.setKategori(kamar.getKategori());
         response.setDeskripsi(kamar.getDeskripsi());
         return response;

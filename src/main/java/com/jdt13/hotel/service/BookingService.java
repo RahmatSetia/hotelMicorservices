@@ -69,10 +69,12 @@ public class BookingService {
         return allBooking.stream().map(this::mapToBookingResponse).toList();
     }
 
-    public void deleteBookingById (Integer id){
+    public String deleteBookingById (Integer id){
+        String ok = "behasil delete Booking dengan idBooking = " + id;
         Optional<Booking> booking = bookingRepository.findById(id);
         if (booking.isEmpty()){throw new ApiRequestException(pesan);}
         bookingRepository.deleteById(id);
+        return ok;
     }
 
     //accCheckin
