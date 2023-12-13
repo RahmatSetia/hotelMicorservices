@@ -3,6 +3,7 @@ package com.jdt13.hotel.service;
 import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.exception.ApiRequestException;
 import com.jdt13.hotel.repository.CustomerRepository;
+import com.jdt13.hotel.repository.ReceptionistRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,11 +22,11 @@ public class TokenService {
         return getToken.isPresent();
     }
 
-    public Integer findCustomer(String token){
+    public Customer findCustomer(String token){
         Optional<Customer> getCustomer = customerRepository.findByToken(token);
         if (getCustomer.isEmpty()){
             throw new ApiRequestException("Token tidak di temukan");
         }
-        return getCustomer.get().getId();
+        return getCustomer.get();
     }
 }
