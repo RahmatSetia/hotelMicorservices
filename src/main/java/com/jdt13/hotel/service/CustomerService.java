@@ -1,6 +1,9 @@
 package com.jdt13.hotel.service;
 
-import com.jdt13.hotel.dto.*;
+import com.jdt13.hotel.dto.CustomerRequest;
+import com.jdt13.hotel.dto.CustomerResponse;
+import com.jdt13.hotel.dto.LoginRequest;
+import com.jdt13.hotel.dto.LoginResponse;
 import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.exception.ApiRequestException;
 import com.jdt13.hotel.repository.CustomerRepository;
@@ -15,10 +18,8 @@ import java.util.Optional;
 public class CustomerService {
 
     private final CustomerRepository customerRepository;
-    private final TokenService tokenService;
 
-    private String idNotFound = "Customer tidak di temukan";
-    private String tokenNotFound = "Anda belum login";
+    String idNotFound = "Customer tidak di temukan";
     public CustomerResponse registerCustomer (CustomerRequest request){
         Customer customer = new Customer();
         customer.setNama(request.getNama());
@@ -27,13 +28,24 @@ public class CustomerService {
         customer.setAlamat(request.getAlamat());
         customer.setPhone(request.getPhone());
         customerRepository.save(customer);
-        return toPaymentResponse(customer);
+
+        CustomerResponse response = new CustomerResponse();
+        response.setId(customer.getId());
+        response.setNama(customer.getNama());
+        response.setUsername(customer.getUsername());
+        response.setPassword(customer.getPassword());
+        response.setPhone(customer.getPhone());
+        response.setAlamat(customer.getAlamat());
+        return response;
     }
 
     public LoginResponse login (LoginRequest request){
         Optional<Customer> customer = customerRepository.findByUsernameAndPassword(request.getUsername(), request.getPassword());
         Customer c = new Customer();
-        if (!customer.isPresent()){throw new ApiRequestException(idNotFound);}
+
+        if (!customer.isPresent()){
+            throw new ApiRequestException(idNotFound);
+        }
         c.setId(customer.get().getId());
         c.setNama(customer.get().getNama());
         c.setUsername(customer.get().getUsername());
@@ -49,18 +61,17 @@ public class CustomerService {
         return response;
     }
 
-    public CustomerResponse findCustomerById (Integer id, String token){
-        if (!tokenService.getToken(token)){throw new ApiRequestException(tokenNotFound);}
+    public Customer findCustomerById (Integer id){
         Optional<Customer> cu = customerRepository.findById(id);
         if (cu.isEmpty()){
             throw new ApiRequestException(idNotFound);
         }
-        return toPaymentResponse(cu.get());
+        return cu.get();
     }
 
-    public CustomerResponse updateCustomer (String token, Integer id, CustomerRequest request){
-        if (!tokenService.getToken(token)){throw new ApiRequestException(tokenNotFound);}
+    public CustomerResponse updateCustomer (Integer id, CustomerRequest request){
         Optional<Customer> cu = customerRepository.findById(id);
+
         if (cu.isEmpty()){
             throw new ApiRequestException(idNotFound);
         }
@@ -73,25 +84,23 @@ public class CustomerService {
         c.setPhone(request.getPhone());
         c.setToken(cu.get().getToken());
         customerRepository.save(c);
-        return toPaymentResponse(c);
+
+        CustomerResponse response = new CustomerResponse();
+        response.setId(c.getId());
+        response.setNama(c.getNama());
+        response.setUsername(c.getUsername());
+        response.setPassword(c.getPassword());
+        response.setAlamat(c.getAlamat());
+        response.setPhone(c.getPhone());
+        return response;
     }
 
     public void deleteCustomerById (Integer id){
+
         Optional<Customer> customer = customerRepository.findById(id);
         if (customer.isEmpty()){
             throw new ApiRequestException(idNotFound);
         }
         customerRepository.deleteById(id);
-    }
-
-    private CustomerResponse toPaymentResponse (Customer customer){
-        CustomerResponse response = new CustomerResponse();
-        response.setId(customer.getId());
-        response.setNama(customer.getNama());
-        response.setUsername(customer.getUsername());
-        response.setPassword(customer.getPassword());
-        response.setPhone(customer.getPhone());
-        response.setAlamat(customer.getAlamat());
-        return response;
     }
 }

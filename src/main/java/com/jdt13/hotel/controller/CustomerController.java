@@ -4,6 +4,7 @@ import com.jdt13.hotel.dto.CustomerRequest;
 import com.jdt13.hotel.dto.CustomerResponse;
 import com.jdt13.hotel.dto.LoginRequest;
 import com.jdt13.hotel.dto.LoginResponse;
+import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.service.CustomerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +21,8 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<CustomerResponse> getCustomerById (@RequestHeader String token ,@PathVariable("id") Integer id){
-        CustomerResponse response = customerService.findCustomerById(id, token);
+    public ResponseEntity<Customer> getCustomerById (@PathVariable("id") Integer id){
+        Customer response = customerService.findCustomerById(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -38,8 +39,8 @@ public class CustomerController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CustomerResponse> updateCustomerById(@RequestHeader String token, @PathVariable("id") Integer id, @Valid @RequestBody CustomerRequest request){
-        CustomerResponse response = customerService.updateCustomer(token, id, request);
+    public ResponseEntity<CustomerResponse> updateCustomerById(@PathVariable("id") Integer id, @Valid @RequestBody CustomerRequest request){
+        CustomerResponse response = customerService.updateCustomer(id, request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
