@@ -293,7 +293,7 @@ class BookingServiceTest {
     void deleteById_PositiveCase(){
         Integer id = 1;
         Booking booking = new Booking();
-        String ok = "behasil delete Booking dengan idBooking = " + id;
+        String ok = "berhasil delete Booking dengan idBooking = " + id;
         when(bookingRepository.findById(id)).thenReturn(Optional.of(booking));
         String responseDelete = bookingService.deleteBookingById(id);
         assertEquals(ok, responseDelete);

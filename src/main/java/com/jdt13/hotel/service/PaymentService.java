@@ -47,10 +47,12 @@ public class PaymentService {
     }
 
     //deleteById
-    public void deletePaymentById (Integer id){
+    public String deletePaymentById (Integer id){
+        String ok = "berhasil delete Paymennt dengan id = " + id;
         Optional<Payment> payment = paymentRepository.findById(id);
         if (payment.isEmpty()){throw new ApiRequestException(pesan);}
         paymentRepository.deleteById(id);
+        return ok;
     }
 
     private PaymentResponse toPaymentResponse (Payment payment){

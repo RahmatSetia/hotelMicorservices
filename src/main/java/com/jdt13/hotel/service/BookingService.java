@@ -13,8 +13,6 @@ import com.jdt13.hotel.repository.KamarRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +68,7 @@ public class BookingService {
     }
 
     public String deleteBookingById (Integer id){
-        String ok = "behasil delete Booking dengan idBooking = " + id;
+        String ok = "berhasil delete Booking dengan idBooking = " + id;
         Optional<Booking> booking = bookingRepository.findById(id);
         if (booking.isEmpty()){throw new ApiRequestException(pesan);}
         bookingRepository.deleteById(id);
