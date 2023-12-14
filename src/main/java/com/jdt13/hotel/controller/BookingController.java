@@ -1,22 +1,5 @@
 package com.jdt13.hotel.controller;
 
-import com.jdt13.hotel.dto.BookingRequest;
-import com.jdt13.hotel.dto.BookingResponse;
-import com.jdt13.hotel.dto.ReportRequest;
-import com.jdt13.hotel.service.BookingService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-@RestController
-@RequestMapping("/hotel/booking")
-@RequiredArgsConstructor
-@Validated
 public class BookingController {
     private final BookingService bookingService;
 
@@ -86,7 +69,3 @@ public class BookingController {
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 }
-
-
-
-

@@ -2,7 +2,6 @@ package com.jdt13.hotel.service;
 
 import com.jdt13.hotel.dto.BookingRequest;
 import com.jdt13.hotel.dto.BookingResponse;
-import com.jdt13.hotel.dto.ReportRequest;
 import com.jdt13.hotel.entity.Booking;
 import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.entity.Kamar;
@@ -23,33 +22,43 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final CustomerRepository customerRepository;
     private final KamarRepository kamarRepository;
-    private final PaymentService paymentService;
     private final TokenService tokenService;
 
-    private String pesan = "Id booking tidak di temukan";
-    private String pesanCustomer = "Id customer tidak di temukan";
-    private String tokenNotFound = "Anda belum login";
     public BookingResponse addBooking (String token, BookingRequest request){
-        if (!tokenService.getToken(token)){throw new ApiRequestException(tokenNotFound);}
+        //id customer dari token sesudah login
+        Integer idCust = tokenService.findCustomer(token);
+        //logic for harga
+        BigDecimal hargaTambahan = new BigDecimal(20000);
+
         Optional<Customer> customer = customerRepository.findById(request.getCustomerId());
-        if (customer.isEmpty()){throw new ApiRequestException(pesanCustomer);}
+        if (customer.isEmpty()){
+            throw new ApiRequestException("Id Customer tidak di temukan");
+        }
+
         Optional<Kamar> kamar = kamarRepository.findById(request.getKamarId());
-        if (kamar.isEmpty()){throw new ApiRequestException("Id Kamar tidak di temukan");}
+        if (kamar.isEmpty()){
+            throw new ApiRequestException("Id Kamar tidak di temukan");
+        }
 
         Booking booking = new Booking();
         booking.setCustomer(customer.get());
         booking.setKamar(kamar.get());
-        booking.setTanggalBooking(new Date());
-        booking.setCheckin(request.getCheckin());
-        booking.setCheckout(request.getCheckout());
-        booking.setTotalHarga(kamar.get().getHarga());
+        booking.setTanggalBooking(request.getTanggalBooking());
+        booking.setTotalHarga(kamar.get().getHarga().add(hargaTambahan));
         booking.setStatusBooking(false);
         bookingRepository.save(booking);
-        paymentService.addPayment(booking);
-        return mapToBookingResponse(booking);
+
+        BookingResponse response = new BookingResponse();
+        response.setId(booking.getId());
+        response.setCustomerId(booking.getCustomer().getId());
+        response.setKamarId(booking.getKamar().getId());
+        response.setTanggalBooking(booking.getTanggalBooking());
+        response.setTotalHarga(booking.getTotalHarga());
+        response.setStatusBooking(booking.getStatusBooking());
+        return response;
     }
 
-    public BookingResponse getBookingById (Integer id){
+    public void deleteBookingById (Integer id){
         Optional<Booking> booking = bookingRepository.findById(id);
         if (booking.isEmpty()){throw new ApiRequestException(pesan);}
         return mapToBookingResponse(booking.get());
@@ -72,70 +81,5 @@ public class BookingService {
         Optional<Booking> booking = bookingRepository.findById(id);
         if (booking.isEmpty()){throw new ApiRequestException(pesan);}
         bookingRepository.deleteById(id);
-        return ok;
-    }
-
-    //accCheckin
-    public BookingResponse checkinBooking (Integer id){
-        Optional<Booking> booking = bookingRepository.findById(id);
-        if (booking.isEmpty()){throw new ApiRequestException(pesan);}
-        if (booking.get().getStatusBooking().booleanValue()){throw new ApiRequestException("Booking status sudah true");}
-        Booking book = new Booking();
-        book.setId(id);
-        book.setCustomer(booking.get().getCustomer());
-        book.setKamar(booking.get().getKamar());
-        book.setCheckin(booking.get().getCheckin());
-        book.setCheckout(booking.get().getCheckout());
-        book.setTanggalBooking(booking.get().getTanggalBooking());
-        book.setTotalHarga(booking.get().getTotalHarga());
-        book.setStatusBooking(true);
-        bookingRepository.save(book);
-        return mapToBookingResponse(book);
-    }
-
-    //accCheckout
-    public BookingResponse checkoutBooking (Integer id){
-        Optional<Booking> booking = bookingRepository.findById(id);
-        if (booking.isEmpty()){throw new ApiRequestException(pesan);}
-        Booking book = new Booking();
-        book.setId(id);
-        book.setCustomer(booking.get().getCustomer());
-        book.setKamar(booking.get().getKamar());
-        book.setCheckin(booking.get().getCheckin());
-        book.setCheckout(booking.get().getCheckout());
-        book.setTanggalBooking(booking.get().getTanggalBooking());
-        book.setTotalHarga(booking.get().getTotalHarga());
-        book.setStatusBooking(null);
-        bookingRepository.save(book);
-        return mapToBookingResponse(book);
-    }
-
-    public List<BookingResponse> allBookingStatusFalse(){
-        List<Booking> booking = bookingRepository.statusBookingFalse();
-        return booking.stream().map(this::mapToBookingResponse).toList();
-    }
-    public List<BookingResponse> allBookingStatusTrue(){
-        List<Booking> booking = bookingRepository.statusBookingTrue();
-        return booking.stream().map(this::mapToBookingResponse).toList();
-    }
-    public List<BookingResponse> allBookingStatusNull(){
-        List<Booking> booking = bookingRepository.statusBookingNull();
-        return booking.stream().map(this::mapToBookingResponse).toList();
-    }
-    public List<BookingResponse> reportByMonth(ReportRequest request){
-        List<Booking> bookings = bookingRepository.reportByDate(request.getStartDay(), request.getEndDay());
-        return bookings.stream().map(this::mapToBookingResponse).toList();
-    }
-
-    private BookingResponse mapToBookingResponse(Booking booking) {
-        BookingResponse bookingResponse = new BookingResponse();
-        bookingResponse.setId(booking.getId());
-        bookingResponse.setCustomerId(booking.getCustomer().getId());
-        bookingResponse.setKamarId(booking.getKamar().getId());
-        bookingResponse.setCheckin(booking.getCheckin());
-        bookingResponse.setCheckout(booking.getCheckout());
-        bookingResponse.setTotalHarga(booking.getTotalHarga());
-        bookingResponse.setStatusBooking(booking.getStatusBooking());
-        return bookingResponse;
     }
 }
