@@ -19,4 +19,24 @@ public class ApiExceptionHandler {
         );
         return new ResponseEntity<>(apiException, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = {ApiExceptionNoContent.class})
+    public ResponseEntity<Object> exceptionResponseNoContent (ApiExceptionNoContent e){
+        ApiException1 apiException = new ApiException1 (
+                e.getMessage(),
+                HttpStatus.NO_CONTENT,
+                ZonedDateTime.now(ZoneId.of("Z"))
+        );
+        return new ResponseEntity<>(apiException, HttpStatus.NO_CONTENT);
+    }
+
+    @ExceptionHandler(value = {ApiExceptionNotFound.class})
+    public ResponseEntity<Object> exceptionResponseNotFound (ApiRequestException e){
+        ApiException1 apiException = new ApiException1 (
+                e.getMessage(),
+                HttpStatus.NOT_FOUND,
+                ZonedDateTime.now(ZoneId.of("Z"))
+        );
+        return new ResponseEntity<>(apiException, HttpStatus.NOT_FOUND);
+    }
 }
