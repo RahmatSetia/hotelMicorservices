@@ -10,8 +10,7 @@ public class BookingResponse {
     private Integer id;
     private Integer kamarId;
     private Integer customerId;
-    private Date checkin;
-    private Date checkout;
+    private Date tanggalBooking;
     private BigDecimal totalHarga;
     private Boolean statusBooking;
 }
