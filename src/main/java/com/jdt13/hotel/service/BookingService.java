@@ -2,6 +2,7 @@ package com.jdt13.hotel.service;
 
 import com.jdt13.hotel.dto.BookingRequest;
 import com.jdt13.hotel.dto.BookingResponse;
+import com.jdt13.hotel.dto.ReportRequest;
 import com.jdt13.hotel.entity.Booking;
 import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.entity.Kamar;
@@ -24,8 +25,12 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final CustomerRepository customerRepository;
     private final KamarRepository kamarRepository;
+    private final PaymentService paymentService;
     private final TokenService tokenService;
 
+    private String pesan = "Id booking tidak di temukan";
+    private String pesanCustomer = "Id customer tidak di temukan";
+    private String tokenNotFound = "Anda belum login";
     public BookingResponse addBooking (String token, BookingRequest request){
         if (!tokenService.getToken(token)){throw new ApiExceptionUnauthorized(tokenNotFound);}
         Optional<Customer> customer = customerRepository.findById(request.getCustomerId());
@@ -44,18 +49,11 @@ public class BookingService {
         booking.setTotalHarga(kamar.get().getHarga());
         booking.setStatusBooking(false);
         bookingRepository.save(booking);
-
-        BookingResponse response = new BookingResponse();
-        response.setId(booking.getId());
-        response.setCustomerId(booking.getCustomer().getId());
-        response.setKamarId(booking.getKamar().getId());
-        response.setTanggalBooking(booking.getTanggalBooking());
-        response.setTotalHarga(booking.getTotalHarga());
-        response.setStatusBooking(booking.getStatusBooking());
-        return response;
+        paymentService.addPayment(booking);
+        return mapToBookingResponse(booking);
     }
 
-    public void deleteBookingById (Integer id){
+    public BookingResponse getBookingById (Integer id){
         Optional<Booking> booking = bookingRepository.findById(id);
         if (booking.isEmpty()){throw new ApiExceptionNotFound(pesan);}
         return mapToBookingResponse(booking.get());
