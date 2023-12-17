@@ -2,9 +2,12 @@ package com.jdt13.hotel.repository;
 
 import com.jdt13.hotel.entity.Kamar;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.Date;
+import java.util.List;
 
 @Repository
 public interface KamarRepository extends JpaRepository<Kamar, Integer> {
