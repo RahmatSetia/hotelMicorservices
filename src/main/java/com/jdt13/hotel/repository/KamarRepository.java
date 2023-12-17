@@ -8,5 +8,15 @@ import java.util.Optional;
 
 @Repository
 public interface KamarRepository extends JpaRepository<Kamar, Integer> {
-    Optional<Kamar> findByNoKamar(Integer noKamar);
+    @Query(value = "SELECT k " +
+            "FROM Booking b " +
+            "RIGHT JOIN b.kamar k " +
+            "WHERE b.statusBooking IS Empty")
+    List<Kamar> findKamarBeforeBookingInCheckinCheckout();
+
+    @Query(value = "SELECT k " +
+            "FROM Booking b " +
+            "RIGHT JOIN b.kamar k " +
+            "WHERE b.statusBooking IS Empty")
+    List<Object> findKamarBeforeBookingInCheckinCheckout(@Param("checkin") Date checkin, @Param("checkout") Date checkout);
 }
