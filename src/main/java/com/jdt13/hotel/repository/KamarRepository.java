@@ -11,12 +11,15 @@ import java.util.List;
 
 @Repository
 public interface KamarRepository extends JpaRepository<Kamar, Integer> {
-    @Query("SELECT k " +
+    @Query(value = "SELECT k " +
             "FROM Booking b " +
             "RIGHT JOIN b.kamar k " +
-            "WHERE b.statusBooking IS NULL " +
-            "AND b.checkin > :checkin " +
-            "AND b.checkout <    :checkout")
+            "WHERE b.statusBooking IS Empty")
+    List<Kamar> findKamarBeforeBookingInCheckinCheckout();
 
-    List<Kamar> findKamarBeforeBookingInCheckinCheckout(@Param("checkin") Date checkin, @Param("checkout") Date checkout);
+    @Query(value = "SELECT k " +
+            "FROM Booking b " +
+            "RIGHT JOIN b.kamar k " +
+            "WHERE b.statusBooking IS Empty")
+    List<Object> findKamarBeforeBookingInCheckinCheckout(@Param("checkin") Date checkin, @Param("checkout") Date checkout);
 }

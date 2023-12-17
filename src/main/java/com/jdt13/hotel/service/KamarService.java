@@ -4,7 +4,9 @@ import com.jdt13.hotel.dto.KamarCheckinRequest;
 import com.jdt13.hotel.dto.KamarRequest;
 import com.jdt13.hotel.dto.KamarResponse;
 import com.jdt13.hotel.entity.Kamar;
-import com.jdt13.hotel.exception.ApiRequestException;
+import com.jdt13.hotel.exception.ApiExceptionNoContent;
+import com.jdt13.hotel.exception.ApiExceptionNotFound;
+import com.jdt13.hotel.exception.ApiExceptionUnauthorized;
 import com.jdt13.hotel.repository.KamarRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,12 +25,13 @@ public class KamarService {
     private String tokenNotFound = "Anda belum login";
 
     public List<Kamar> getAllKamarBeforeBooking (KamarCheckinRequest kamarCheckinRequest){
-        return kamarRepository.findKamarBeforeBookingInCheckinCheckout(kamarCheckinRequest.getCheckin(), kamarCheckinRequest.getCheckout());
+        return kamarRepository.findKamarBeforeBookingInCheckinCheckout();
     }
 
     public List<KamarResponse> getAllKamar (String token){
-        if (!tokenService.getToken(token)){throw new ApiRequestException(tokenNotFound);}
+        if (!tokenService.getToken(token)){throw new ApiExceptionUnauthorized(tokenNotFound);}
         List<Kamar> kamars = kamarRepository.findAll();
+        if (kamars.isEmpty()){throw new ApiExceptionNoContent("Data kamar kosong");}
         return kamars.stream().map(this::toResponseKamar).toList();
     }
 
@@ -44,7 +47,7 @@ public class KamarService {
 
     public KamarResponse updateKamarById (Integer id, KamarRequest request){
         Optional<Kamar> k = kamarRepository.findById(id);
-        if (k.isEmpty()){throw new ApiRequestException(pesan);}
+        if (k.isEmpty()){throw new ApiExceptionNotFound(pesan);}
         Kamar kamar = new Kamar();
         kamar.setId(k.get().getId());
         kamar.setNoKamar(request.getNoKamar());
@@ -58,7 +61,7 @@ public class KamarService {
     public String deleteKamarIdKamar(Integer id){
         String ok = "behasil delete Kamar dengan idBooking = " + id;
         Optional<Kamar> kamarId = kamarRepository.findById(id);
-        if (kamarId.isEmpty()){throw new ApiRequestException(pesan);}
+        if (kamarId.isEmpty()){throw new ApiExceptionNotFound(pesan);}
         kamarRepository.deleteById(id);
         return ok;
     }

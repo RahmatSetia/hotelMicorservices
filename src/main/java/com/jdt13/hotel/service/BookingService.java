@@ -6,6 +6,8 @@ import com.jdt13.hotel.dto.ReportRequest;
 import com.jdt13.hotel.entity.Booking;
 import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.entity.Kamar;
+import com.jdt13.hotel.exception.ApiExceptionNotFound;
+import com.jdt13.hotel.exception.ApiExceptionUnauthorized;
 import com.jdt13.hotel.exception.ApiRequestException;
 import com.jdt13.hotel.repository.BookingRepository;
 import com.jdt13.hotel.repository.CustomerRepository;
@@ -30,17 +32,19 @@ public class BookingService {
     private String pesanCustomer = "Id customer tidak di temukan";
     private String tokenNotFound = "Anda belum login";
     public BookingResponse addBooking (String token, BookingRequest request){
-        if (!tokenService.getToken(token)){throw new ApiRequestException(tokenNotFound);}
+        if (!tokenService.getToken(token)){throw new ApiExceptionUnauthorized(tokenNotFound);}
         Optional<Customer> customer = customerRepository.findById(request.getCustomerId());
-        if (customer.isEmpty()){throw new ApiRequestException(pesanCustomer);}
+        if (customer.isEmpty()){throw new ApiExceptionNotFound(pesanCustomer);}
         Optional<Kamar> kamar = kamarRepository.findById(request.getKamarId());
-        if (kamar.isEmpty()){throw new ApiRequestException("Id Kamar tidak di temukan");}
+        if (kamar.isEmpty()){throw new ApiExceptionNotFound("Id Kamar tidak di temukan");}
 
         Booking booking = new Booking();
         booking.setCustomer(customer.get());
         booking.setKamar(kamar.get());
         booking.setTanggalBooking(new Date());
+        //keisi ketika chekin
         booking.setCheckin(request.getCheckin());
+        //keisi ketika checkout
         booking.setCheckout(request.getCheckout());
         booking.setTotalHarga(kamar.get().getHarga());
         booking.setStatusBooking(false);
@@ -51,14 +55,14 @@ public class BookingService {
 
     public BookingResponse getBookingById (Integer id){
         Optional<Booking> booking = bookingRepository.findById(id);
-        if (booking.isEmpty()){throw new ApiRequestException(pesan);}
+        if (booking.isEmpty()){throw new ApiExceptionNotFound(pesan);}
         return mapToBookingResponse(booking.get());
     }
 
     //reportBookingByCustomerId
     public List<BookingResponse> getBookingByCustomerId (Integer id){
         List<Booking> booking = bookingRepository.customerId(id);
-        if (booking.isEmpty()){throw new ApiRequestException(pesanCustomer);}
+        if (booking.isEmpty()){throw new ApiExceptionNotFound(pesanCustomer);}
         return booking.stream().map(this::mapToBookingResponse).toList();
     }
 
@@ -70,7 +74,7 @@ public class BookingService {
     public String deleteBookingById (Integer id){
         String ok = "berhasil delete Booking dengan idBooking = " + id;
         Optional<Booking> booking = bookingRepository.findById(id);
-        if (booking.isEmpty()){throw new ApiRequestException(pesan);}
+        if (booking.isEmpty()){throw new ApiExceptionNotFound(pesan);}
         bookingRepository.deleteById(id);
         return ok;
     }
@@ -96,7 +100,7 @@ public class BookingService {
     //accCheckout
     public BookingResponse checkoutBooking (Integer id){
         Optional<Booking> booking = bookingRepository.findById(id);
-        if (booking.isEmpty()){throw new ApiRequestException(pesan);}
+        if (booking.isEmpty()){throw new ApiExceptionNotFound(pesan);}
         Booking book = new Booking();
         book.setId(id);
         book.setCustomer(booking.get().getCustomer());
