@@ -6,12 +6,14 @@ import com.jdt13.hotel.dto.ReportRequest;
 import com.jdt13.hotel.entity.Booking;
 import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.entity.Kamar;
+import com.jdt13.hotel.entity.Receptionist;
 import com.jdt13.hotel.exception.ApiExceptionNotFound;
 import com.jdt13.hotel.exception.ApiExceptionUnauthorized;
 import com.jdt13.hotel.exception.ApiRequestException;
 import com.jdt13.hotel.repository.BookingRepository;
 import com.jdt13.hotel.repository.CustomerRepository;
 import com.jdt13.hotel.repository.KamarRepository;
+import com.jdt13.hotel.repository.ReceptionistRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,19 +29,20 @@ public class BookingService {
     private final KamarRepository kamarRepository;
     private final PaymentService paymentService;
     private final TokenService tokenService;
+    private final ReceptionistRepository receptionistRepository;
+    private final PinaltiService pinaltiService;
 
     private String pesan = "Id booking tidak di temukan";
     private String pesanCustomer = "Id customer tidak di temukan";
     private String tokenNotFound = "Anda belum login";
     public BookingResponse addBooking (String token, BookingRequest request){
         if (!tokenService.getToken(token)){throw new ApiExceptionUnauthorized(tokenNotFound);}
-        Optional<Customer> customer = customerRepository.findById(request.getCustomerId());
-        if (customer.isEmpty()){throw new ApiExceptionNotFound(pesanCustomer);}
+        Customer customer = customerRepository.findById(request.getCustomerId()).orElseThrow(() -> new ApiExceptionNotFound(pesanCustomer));
         Optional<Kamar> kamar = kamarRepository.findById(request.getKamarId());
         if (kamar.isEmpty()){throw new ApiExceptionNotFound("Id Kamar tidak di temukan");}
 
         Booking booking = new Booking();
-        booking.setCustomer(customer.get());
+        booking.setCustomer(customer);
         booking.setKamar(kamar.get());
         booking.setTanggalBooking(new Date());
         //keisi ketika chekin
@@ -80,7 +83,9 @@ public class BookingService {
     }
 
     //accCheckin
-    public BookingResponse checkinBooking (Integer id){
+    public BookingResponse checkinBooking (Integer id, String tokenRecep){
+        if (!tokenService.getTokenReceptionist(tokenRecep)){throw new ApiExceptionUnauthorized(tokenNotFound);}
+
         Optional<Booking> booking = bookingRepository.findById(id);
         if (booking.isEmpty()){throw new ApiRequestException(pesan);}
         if (booking.get().getStatusBooking().booleanValue()){throw new ApiRequestException("Booking status sudah true");}
@@ -98,7 +103,11 @@ public class BookingService {
     }
 
     //accCheckout
-    public BookingResponse checkoutBooking (Integer id){
+    public BookingResponse checkoutBooking (Integer id, String tokenRecep){
+        if (!tokenService.getTokenReceptionist(tokenRecep)){throw new ApiExceptionUnauthorized(tokenNotFound);}
+        Receptionist receptionist = receptionistRepository.findByToken(tokenRecep).orElseThrow(() -> new ApiExceptionUnauthorized(tokenNotFound));
+//        if (receptionistRepository.findByToken(tokenRecep).isEmpty()){throw new ApiExceptionUnauthorized(tokenNotFound);}
+
         Optional<Booking> booking = bookingRepository.findById(id);
         if (booking.isEmpty()){throw new ApiExceptionNotFound(pesan);}
         Booking book = new Booking();
@@ -111,6 +120,7 @@ public class BookingService {
         book.setTotalHarga(booking.get().getTotalHarga());
         book.setStatusBooking(null);
         bookingRepository.save(book);
+        pinaltiService.addPinalti(booking.get(), receptionist.getId());
         return mapToBookingResponse(book);
     }
 
