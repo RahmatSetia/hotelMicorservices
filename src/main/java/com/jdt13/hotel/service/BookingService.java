@@ -107,7 +107,7 @@ public class BookingService {
         if (!tokenService.getTokenReceptionist(tokenRecep)){throw new ApiExceptionUnauthorized(tokenNotFound);}
         Receptionist receptionist = receptionistRepository.findByToken(tokenRecep).orElseThrow(() -> new ApiExceptionUnauthorized(tokenNotFound));
 //        if (receptionistRepository.findByToken(tokenRecep).isEmpty()){throw new ApiExceptionUnauthorized(tokenNotFound);}
-
+        //set jam 1
         Optional<Booking> booking = bookingRepository.findById(id);
         if (booking.isEmpty()){throw new ApiExceptionNotFound(pesan);}
         Booking book = new Booking();
