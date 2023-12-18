@@ -1,8 +1,10 @@
 package com.jdt13.hotel.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -13,7 +15,9 @@ public class Pinalti {
     private Integer id;
     @OneToOne
     private Booking booking;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Date dateCheckout;
     @OneToOne
     private Receptionist receptionist;
+    private BigDecimal denda;
 }

@@ -7,12 +7,14 @@ import com.jdt13.hotel.dto.ReportRequest;
 import com.jdt13.hotel.entity.Booking;
 import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.entity.Kamar;
+import com.jdt13.hotel.entity.Receptionist;
 import com.jdt13.hotel.exception.ApiExceptionNotFound;
 import com.jdt13.hotel.exception.ApiExceptionUnauthorized;
 import com.jdt13.hotel.exception.ApiRequestException;
 import com.jdt13.hotel.repository.BookingRepository;
 import com.jdt13.hotel.repository.CustomerRepository;
 import com.jdt13.hotel.repository.KamarRepository;
+import com.jdt13.hotel.repository.ReceptionistRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -47,6 +49,9 @@ class BookingServiceTest {
 
     @Mock
     private PaymentService paymentService;
+
+    @Mock
+    private ReceptionistRepository receptionistRepository;
 
     @BeforeEach
     public void setUp(){
@@ -347,7 +352,8 @@ class BookingServiceTest {
         String pesan = "Booking status sudah true";
 
         when(bookingRepository.findById(any())).thenReturn(Optional.of(fakeBooking));
-        ApiRequestException exception = assertThrows(ApiRequestException.class,() -> bookingService.checkinBooking(id));
+        when(tokenService.getTokenReceptionist(any())).thenReturn(true);
+        ApiRequestException exception = assertThrows(ApiRequestException.class,() -> bookingService.checkinBooking(id, "token"));
         assertEquals(exception.getMessage(), pesan);
     }
 
@@ -382,7 +388,8 @@ class BookingServiceTest {
 
         when(bookingRepository.findById(id)).thenReturn(Optional.of(fakeBooking));
         when(bookingRepository.save(any(Booking.class))).thenReturn(fakeBooking);
-        BookingResponse response = bookingService.checkinBooking(id);
+        when(tokenService.getTokenReceptionist(any())).thenReturn(true);
+        BookingResponse response = bookingService.checkinBooking(id, "token");
         assertTrue(response.getStatusBooking());
     }
 
@@ -391,6 +398,13 @@ class BookingServiceTest {
         Integer id = 12;
 
         Date date = new Date();
+
+        Receptionist receptionist = new Receptionist();
+        receptionist.setId(21);
+        receptionist.setNama("nama");
+        receptionist.setUsername("username");
+        receptionist.setPassword("password");
+        receptionist.setToken("token");
 
         Customer customer = new Customer();
         customer.setId(10);
@@ -418,16 +432,23 @@ class BookingServiceTest {
 
         when(bookingRepository.findById(id)).thenReturn(Optional.of(fakeBooking));
         when(bookingRepository.save(any(Booking.class))).thenReturn(fakeBooking);
-        BookingResponse response = bookingService.checkoutBooking(id);
+        when(tokenService.getTokenReceptionist("token")).thenReturn(true);
+        BookingResponse response = bookingService.checkoutBooking(id, "token");
         assertNull(response.getStatusBooking());
     }
 
     @Test
     void CheckoutBooking_returnPesanNegative(){
+        Receptionist receptionist = new Receptionist();
+        receptionist.setId(21);
+        receptionist.setNama("awang");
+        receptionist.setToken("token");
+
         Integer fakeId = 132;
-        String pesan = "Id booking tidak di temukan";
+        String pesan = "Anda belum login";
         when(bookingRepository.findById(any())).thenReturn(Optional.empty());
-        ApiExceptionNotFound exception = assertThrows(ApiExceptionNotFound.class,() -> bookingService.checkoutBooking(fakeId));
+        when(receptionistRepository.findByToken(any())).thenReturn(Optional.of(receptionist));
+        ApiExceptionUnauthorized exception = assertThrows(ApiExceptionUnauthorized.class,() -> bookingService.checkoutBooking(fakeId, "token"));
         assertEquals(exception.getMessage(), pesan);
     }
 
