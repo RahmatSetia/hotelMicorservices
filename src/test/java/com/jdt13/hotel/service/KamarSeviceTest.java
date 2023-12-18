@@ -3,7 +3,9 @@ package com.jdt13.hotel.service;
 import com.jdt13.hotel.dto.KamarRequest;
 import com.jdt13.hotel.dto.KamarResponse;
 import com.jdt13.hotel.entity.Kamar;
-import com.jdt13.hotel.exception.ApiRequestException;
+import com.jdt13.hotel.exception.ApiExceptionNoContent;
+import com.jdt13.hotel.exception.ApiExceptionNotFound;
+import com.jdt13.hotel.exception.ApiExceptionUnauthorized;
 import com.jdt13.hotel.repository.KamarRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,12 +13,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static org.junit.jupiter.api.Assertions.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 class KamarSeviceTest {
@@ -67,8 +70,19 @@ class KamarSeviceTest {
         kamarList.add(kamar);
         when(tokenService.getToken(token)).thenReturn(false);
         when(kamarRepository.findAll()).thenReturn(kamarList);
-        ApiRequestException exception = assertThrows(ApiRequestException.class, () -> kamarService.getAllKamar(token));
+        ApiExceptionUnauthorized exception = assertThrows(ApiExceptionUnauthorized.class, () -> kamarService.getAllKamar(token));
         assertEquals(exception.getMessage(), tokenNotFound);
+    }
+
+    @Test
+    void getAllKamarAsListNoContent(){
+        String token = "token";
+        String kamarEmpty = "Data kamar kosong";
+        List<Kamar> kamarList = new ArrayList<>();
+        when(tokenService.getToken(token)).thenReturn(true);
+        when(kamarRepository.findAll()).thenReturn(kamarList);
+        ApiExceptionNoContent exception = assertThrows(ApiExceptionNoContent.class, () -> kamarService.getAllKamar(token));
+        assertEquals(exception.getMessage(), kamarEmpty);
     }
 
     @Test
@@ -136,7 +150,7 @@ class KamarSeviceTest {
         String pesan = "Kamar tidak di temukan";
         KamarRequest request = new KamarRequest();
         when(kamarRepository.findById(any())).thenReturn(Optional.empty());
-        ApiRequestException exception = assertThrows(ApiRequestException.class, () -> kamarService.updateKamarById(fakeId, request));
+        ApiExceptionNotFound exception = assertThrows(ApiExceptionNotFound.class, () -> kamarService.updateKamarById(fakeId, request));
         assertEquals(pesan, exception.getMessage());
     }
 
@@ -156,7 +170,7 @@ class KamarSeviceTest {
         String pesan = "Kamar tidak di temukan";
         Kamar kamar = new Kamar();
         when(kamarRepository.findById(id)).thenReturn(Optional.empty());
-        ApiRequestException exception = assertThrows(ApiRequestException.class, () -> kamarService.deleteKamarIdKamar(id));
+        ApiExceptionNotFound exception = assertThrows(ApiExceptionNotFound.class, () -> kamarService.deleteKamarIdKamar(id));
         assertEquals(exception.getMessage(), pesan);
     }
 

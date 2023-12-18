@@ -7,10 +7,14 @@ import com.jdt13.hotel.dto.ReportRequest;
 import com.jdt13.hotel.entity.Booking;
 import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.entity.Kamar;
+import com.jdt13.hotel.entity.Receptionist;
+import com.jdt13.hotel.exception.ApiExceptionNotFound;
+import com.jdt13.hotel.exception.ApiExceptionUnauthorized;
 import com.jdt13.hotel.exception.ApiRequestException;
 import com.jdt13.hotel.repository.BookingRepository;
 import com.jdt13.hotel.repository.CustomerRepository;
 import com.jdt13.hotel.repository.KamarRepository;
+import com.jdt13.hotel.repository.ReceptionistRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -45,6 +49,9 @@ class BookingServiceTest {
 
     @Mock
     private PaymentService paymentService;
+
+    @Mock
+    private ReceptionistRepository receptionistRepository;
 
     @BeforeEach
     public void setUp(){
@@ -108,7 +115,7 @@ class BookingServiceTest {
         String pesan = "Anda belum login";
         BookingRequest request = new BookingRequest();
         when(tokenService.getToken(any())).thenReturn(false);
-        ApiRequestException exception = assertThrows(ApiRequestException.class, ()-> bookingService.addBooking("token", request));
+        ApiExceptionUnauthorized exception = assertThrows(ApiExceptionUnauthorized.class, ()-> bookingService.addBooking("token", request));
         assertEquals(pesan, exception.getMessage());
     }
 
@@ -118,7 +125,7 @@ class BookingServiceTest {
         BookingRequest request = new BookingRequest();
         when(tokenService.getToken("token")).thenReturn(true);
         when(customerRepository.findById(any())).thenReturn(Optional.empty());
-        ApiRequestException exception = assertThrows(ApiRequestException.class, ()-> bookingService.addBooking("token", request));
+        ApiExceptionNotFound exception = assertThrows(ApiExceptionNotFound.class, ()-> bookingService.addBooking("token", request));
         assertEquals(pesanCustomer, exception.getMessage());
     }
 
@@ -136,10 +143,9 @@ class BookingServiceTest {
         when(tokenService.getToken("token")).thenReturn(true);
         when(customerRepository.findById(any())).thenReturn(Optional.of(customer));
         when(kamarRepository.findById(any())).thenReturn(Optional.empty());
-        ApiRequestException exception = assertThrows(ApiRequestException.class, ()-> bookingService.addBooking("token", request));
+        ApiExceptionNotFound exception = assertThrows(ApiExceptionNotFound.class, ()-> bookingService.addBooking("token", request));
         assertEquals(pesan, exception.getMessage());
     }
-    //addBookingNegative
 
     @Test
     void getBookingById_WillReturnBooking(){
@@ -189,7 +195,7 @@ class BookingServiceTest {
         String pesan = "Id booking tidak di temukan";
         when(bookingRepository.findById(fakeId)).thenReturn(Optional.empty());
 
-        ApiRequestException exception = assertThrows(ApiRequestException.class,() -> bookingService.getBookingById(fakeId));
+        ApiExceptionNotFound exception = assertThrows(ApiExceptionNotFound.class,() -> bookingService.getBookingById(fakeId));
         assertEquals(pesan, exception.getMessage());
     }
 
@@ -241,11 +247,9 @@ class BookingServiceTest {
     void getListBookingByCustomerId_NegativeCase(){
         String pesanCustomer = "Id customer tidak di temukan";
         Integer id = 2;
-        ApiRequestException apiRequestException = new ApiRequestException(pesanCustomer);
-
+        ApiExceptionNotFound apiRequestException = new ApiExceptionNotFound(pesanCustomer);
         when(bookingRepository.customerId(id)).thenThrow(apiRequestException);
-
-        ApiRequestException exception = assertThrows(ApiRequestException.class, ()-> bookingService.getBookingByCustomerId(id ));
+        ApiExceptionNotFound exception = assertThrows(ApiExceptionNotFound.class, ()-> bookingService.getBookingByCustomerId(id));
         assertEquals(pesanCustomer, exception.getMessage());
     }
 
@@ -293,7 +297,7 @@ class BookingServiceTest {
     void deleteById_PositiveCase(){
         Integer id = 1;
         Booking booking = new Booking();
-        String ok = "behasil delete Booking dengan idBooking = " + id;
+        String ok = "berhasil delete Booking dengan idBooking = " + id;
         when(bookingRepository.findById(id)).thenReturn(Optional.of(booking));
         String responseDelete = bookingService.deleteBookingById(id);
         assertEquals(ok, responseDelete);
@@ -304,17 +308,16 @@ class BookingServiceTest {
         Integer id = 1;
         String pesan = "Id booking tidak di temukan";
         when(bookingRepository.findById(id)).thenReturn(Optional.empty());
-        ApiRequestException exception = assertThrows(ApiRequestException.class, () -> bookingService.deleteBookingById(id));
+        ApiExceptionNotFound exception = assertThrows(ApiExceptionNotFound.class, () -> bookingService.deleteBookingById(id));
         assertEquals(pesan, exception.getMessage());
     }
 
     @Test
-    void CheckinBooking_NegativeBookingEmpety(){
+    void CheckinBooking_NegativeBookingEmpty(){
         Integer fakeId = 132;
         String pesan = "Id booking tidak di temukan";
-
         when(bookingRepository.findById(any())).thenReturn(Optional.empty());
-        ApiRequestException exception = assertThrows(ApiRequestException.class,() -> bookingService.getBookingById(fakeId));
+        ApiExceptionNotFound exception = assertThrows(ApiExceptionNotFound.class,() -> bookingService.getBookingById(fakeId));
         assertEquals(exception.getMessage(), pesan);
     }
 
@@ -349,7 +352,8 @@ class BookingServiceTest {
         String pesan = "Booking status sudah true";
 
         when(bookingRepository.findById(any())).thenReturn(Optional.of(fakeBooking));
-        ApiRequestException exception = assertThrows(ApiRequestException.class,() -> bookingService.checkinBooking(id));
+        when(tokenService.getTokenReceptionist(any())).thenReturn(true);
+        ApiRequestException exception = assertThrows(ApiRequestException.class,() -> bookingService.checkinBooking(id, "token"));
         assertEquals(exception.getMessage(), pesan);
     }
 
@@ -384,7 +388,8 @@ class BookingServiceTest {
 
         when(bookingRepository.findById(id)).thenReturn(Optional.of(fakeBooking));
         when(bookingRepository.save(any(Booking.class))).thenReturn(fakeBooking);
-        BookingResponse response = bookingService.checkinBooking(id);
+        when(tokenService.getTokenReceptionist(any())).thenReturn(true);
+        BookingResponse response = bookingService.checkinBooking(id, "token");
         assertTrue(response.getStatusBooking());
     }
 
@@ -393,6 +398,13 @@ class BookingServiceTest {
         Integer id = 12;
 
         Date date = new Date();
+
+        Receptionist receptionist = new Receptionist();
+        receptionist.setId(21);
+        receptionist.setNama("nama");
+        receptionist.setUsername("username");
+        receptionist.setPassword("password");
+        receptionist.setToken("token");
 
         Customer customer = new Customer();
         customer.setId(10);
@@ -420,17 +432,23 @@ class BookingServiceTest {
 
         when(bookingRepository.findById(id)).thenReturn(Optional.of(fakeBooking));
         when(bookingRepository.save(any(Booking.class))).thenReturn(fakeBooking);
-        BookingResponse response = bookingService.checkoutBooking(id);
+        when(tokenService.getTokenReceptionist("token")).thenReturn(true);
+        BookingResponse response = bookingService.checkoutBooking(id, "token");
         assertNull(response.getStatusBooking());
     }
 
     @Test
     void CheckoutBooking_returnPesanNegative(){
-        Integer fakeId = 132;
-        String pesan = "Id booking tidak di temukan";
+        Receptionist receptionist = new Receptionist();
+        receptionist.setId(21);
+        receptionist.setNama("awang");
+        receptionist.setToken("token");
 
+        Integer fakeId = 132;
+        String pesan = "Anda belum login";
         when(bookingRepository.findById(any())).thenReturn(Optional.empty());
-        ApiRequestException exception = assertThrows(ApiRequestException.class,() -> bookingService.checkoutBooking(fakeId));
+        when(receptionistRepository.findByToken(any())).thenReturn(Optional.of(receptionist));
+        ApiExceptionUnauthorized exception = assertThrows(ApiExceptionUnauthorized.class,() -> bookingService.checkoutBooking(fakeId, "token"));
         assertEquals(exception.getMessage(), pesan);
     }
 

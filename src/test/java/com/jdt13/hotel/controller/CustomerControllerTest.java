@@ -35,7 +35,7 @@ class CustomerControllerTest {
     void testGetCustomerById() {
         // Arrange
         int customerId = 1;
-        Customer mockCustomer = new Customer();
+        CustomerResponse mockCustomer = new CustomerResponse();
         when(customerService.findCustomerById(customerId)).thenReturn(mockCustomer);
 
         // Act

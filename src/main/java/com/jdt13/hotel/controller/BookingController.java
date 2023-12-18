@@ -69,21 +69,21 @@ public class BookingController {
     }
 
     @PutMapping("checkin/{id}")
-    public ResponseEntity<BookingResponse> checkin (@PathVariable("id") Integer id){
-        BookingResponse response = bookingService.checkinBooking(id);
+    public ResponseEntity<BookingResponse> checkin (@PathVariable("id") Integer id, @RequestHeader String tokenRecip){
+        BookingResponse response = bookingService.checkinBooking(id, tokenRecip);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping("checkout/{id}")
-    public ResponseEntity<BookingResponse> checkout (@PathVariable("id") Integer id){
-        BookingResponse response = bookingService.checkoutBooking(id);
+    public ResponseEntity<BookingResponse> checkout (@PathVariable("id") Integer id, @RequestHeader String tokenRecip){
+        BookingResponse response = bookingService.checkoutBooking(id, tokenRecip);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<BookingResponse> deleteBookingById(@PathVariable("id") Integer id){
+    public ResponseEntity<String> deleteBookingById(@PathVariable("id") Integer id){
         String response = bookingService.deleteBookingById(id);
-        return new ResponseEntity(response, HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
     }
 }
 
