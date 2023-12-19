@@ -23,7 +23,6 @@ public class KamarService {
     private String pesan = "Kamar tidak di temukan";
     private String tokenNotFound = "Anda belum login";
 
-
     public List<KamarResponse> getAllKamar (String token){
         if (!tokenService.getToken(token)){throw new ApiExceptionUnauthorized(tokenNotFound);}
         List<Kamar> kamars = kamarRepository.findAll();
