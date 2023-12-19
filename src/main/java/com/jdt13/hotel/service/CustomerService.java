@@ -2,6 +2,7 @@ package com.jdt13.hotel.service;
 
 import com.jdt13.hotel.dto.*;
 import com.jdt13.hotel.entity.Customer;
+import com.jdt13.hotel.exception.ApiExceptionNotFound;
 import com.jdt13.hotel.exception.ApiRequestException;
 import com.jdt13.hotel.repository.CustomerRepository;
 import com.jdt13.hotel.util.Jwt;
@@ -26,19 +27,18 @@ public class CustomerService {
         customer.setAlamat(request.getAlamat());
         customer.setPhone(request.getPhone());
         customerRepository.save(customer);
-        return toPaymentResponse(customer);
+        return toCustomerResponse(customer);
     }
 
     public LoginResponse login (LoginRequest request){
-        Optional<Customer> customer = customerRepository.findByUsernameAndPassword(request.getUsername(), request.getPassword());
+        Customer customer = customerRepository.findByUsernameAndPassword(request.getUsername(), request.getPassword()).orElseThrow(()-> new ApiExceptionNotFound(idNotFound));
         Customer c = new Customer();
-        if (!customer.isPresent()){throw new ApiRequestException(idNotFound);}
-        c.setId(customer.get().getId());
-        c.setNama(customer.get().getNama());
-        c.setUsername(customer.get().getUsername());
-        c.setPassword(customer.get().getPassword());
-        c.setAlamat(customer.get().getAlamat());
-        c.setPhone(customer.get().getPhone());
+        c.setId(customer.getId());
+        c.setNama(customer.getNama());
+        c.setUsername(customer.getUsername());
+        c.setPassword(customer.getPassword());
+        c.setAlamat(customer.getAlamat());
+        c.setPhone(customer.getPhone());
         c.setToken(Jwt.getToken(request));
         customerRepository.save(c);
 
@@ -49,30 +49,24 @@ public class CustomerService {
     }
 
     public CustomerResponse findCustomerById (Integer id, String token){
-        if (!tokenService.getToken(token)){throw new ApiRequestException(tokenNotFound);}
-        Optional<Customer> cu = customerRepository.findById(id);
-        if (cu.isEmpty()){
-            throw new ApiRequestException(idNotFound);
-        }
-        return toPaymentResponse(cu.get());
+        if (!tokenService.getToken(token)){throw new ApiExceptionNotFound(tokenNotFound);}
+        Customer customer = customerRepository.findById(id).orElseThrow(() -> new ApiExceptionNotFound(idNotFound));
+        return toCustomerResponse(customer);
     }
 
     public CustomerResponse updateCustomer (String token, Integer id, CustomerRequest request){
-        if (!tokenService.getToken(token)){throw new ApiRequestException(tokenNotFound);}
-        Optional<Customer> cu = customerRepository.findById(id);
-        if (cu.isEmpty()){
-            throw new ApiRequestException(idNotFound);
-        }
+        if (!tokenService.getToken(token)){throw new ApiExceptionNotFound(tokenNotFound);}
+        Customer customer = customerRepository.findById(id).orElseThrow(() -> new ApiExceptionNotFound(idNotFound));
         Customer c = new Customer();
-        c.setId(cu.get().getId());
+        c.setId(customer.getId());
         c.setNama(request.getNama());
         c.setUsername(request.getUsername());
         c.setPassword(request.getPassword());
         c.setAlamat(request.getAlamat());
         c.setPhone(request.getPhone());
-        c.setToken(cu.get().getToken());
+        c.setToken(customer.getToken());
         customerRepository.save(c);
-        return toPaymentResponse(c);
+        return toCustomerResponse(c);
     }
 
     public void deleteCustomerById (Integer id){
@@ -83,7 +77,7 @@ public class CustomerService {
         customerRepository.deleteById(id);
     }
 
-    private CustomerResponse toPaymentResponse (Customer customer){
+    private CustomerResponse toCustomerResponse(Customer customer){
         CustomerResponse response = new CustomerResponse();
         response.setId(customer.getId());
         response.setNama(customer.getNama());

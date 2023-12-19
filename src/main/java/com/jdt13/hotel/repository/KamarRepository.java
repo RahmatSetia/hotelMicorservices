@@ -17,9 +17,9 @@ public interface KamarRepository extends JpaRepository<Kamar, Integer> {
             "WHERE b.statusBooking IS Empty")
     List<Kamar> findKamarBeforeBookingInCheckinCheckout();
 
-    @Query(value = "SELECT k " +
-            "FROM Booking b " +
-            "RIGHT JOIN b.kamar k " +
-            "WHERE b.statusBooking IS Empty")
-    List<Object> findKamarBeforeBookingInCheckinCheckout(@Param("checkin") Date checkin, @Param("checkout") Date checkout);
+//    @Query(value = "SELECT k " +
+//            "FROM Booking b " +
+//            "RIGHT JOIN b.kamar k " +
+//            "WHERE b.statusBooking IS Empty")
+//    List<Object> findKamarBeforeBookingInCheckinCheckout(@Param("checkin") Date checkin, @Param("checkout") Date checkout);
 }
