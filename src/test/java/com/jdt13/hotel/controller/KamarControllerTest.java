@@ -70,16 +70,24 @@ class KamarControllerTest {
 
     @Test
     void testUpdateKamar(){
+        Integer id = 1;
         KamarResponse response = new KamarResponse();
+        response.setId(id);
+        response.setHarga(BigDecimal.valueOf(200000));
+        response.setNoKamar(12);
+        response.setDeskripsi("test kamar update by ID");
+        response.setKategori("deluxe");
+
         KamarRequest request = new KamarRequest();
-        request.setNoKamar(1);
+        request.setNoKamar(id);
         request.setHarga(BigDecimal.valueOf(2));
         request.setDeskripsi("ini kamar");
         request.setKategori("ini kategori");
-        when(kamarService.updateKamarById(1, request)).thenReturn(response);
-        ResponseEntity<KamarResponse> resController = kamarController.updateKamar();
 
-        assertEquals(HttpStatus.NO_CONTENT, resController.getStatusCode());
-        assertEquals(resController.getBody(),response);
+        when(kamarService.updateKamarById(id, request)).thenReturn(response);
+        ResponseEntity<KamarResponse> resController = kamarController.updateKamar(id, request);
+
+        assertEquals(HttpStatus.CREATED, resController.getStatusCode());
+        assertEquals(resController.getBody(), response);
     }
 }
