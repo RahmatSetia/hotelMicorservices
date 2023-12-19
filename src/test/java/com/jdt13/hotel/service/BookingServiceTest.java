@@ -1,9 +1,6 @@
 package com.jdt13.hotel.service;
 
-import com.jdt13.hotel.dto.BookingRequest;
-import com.jdt13.hotel.dto.BookingResponse;
-import com.jdt13.hotel.dto.PaymentResponse;
-import com.jdt13.hotel.dto.ReportRequest;
+import com.jdt13.hotel.dto.*;
 import com.jdt13.hotel.entity.Booking;
 import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.entity.Kamar;
@@ -49,6 +46,9 @@ class BookingServiceTest {
 
     @Mock
     private PaymentService paymentService;
+
+    @Mock
+    private PinaltiService pinaltiService;
 
     @Mock
     private ReceptionistRepository receptionistRepository;
@@ -430,9 +430,18 @@ class BookingServiceTest {
         fakeBooking.setTotalHarga(kamar.getHarga());
         fakeBooking.setStatusBooking(false);
 
+        PinaltiResponse pinaltiResponse = new PinaltiResponse();
+        pinaltiResponse.setId(2);
+        pinaltiResponse.setBookingId(fakeBooking.getId());
+        pinaltiResponse.setReceptionist(receptionist.getId());
+        pinaltiResponse.setDenda(kamar.getHarga().multiply(BigDecimal.valueOf(1.5)));
+        pinaltiResponse.setDateCheckout(new Date());
+
         when(bookingRepository.findById(id)).thenReturn(Optional.of(fakeBooking));
         when(bookingRepository.save(any(Booking.class))).thenReturn(fakeBooking);
+        when(receptionistRepository.findByToken("token")).thenReturn(Optional.of(receptionist));
         when(tokenService.getTokenReceptionist("token")).thenReturn(true);
+        when(pinaltiService.addPinalti(fakeBooking, receptionist.getId())).thenReturn(pinaltiResponse);
         BookingResponse response = bookingService.checkoutBooking(id, "token");
         assertNull(response.getStatusBooking());
     }
