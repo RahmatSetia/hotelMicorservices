@@ -18,7 +18,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-public class TokenServiceTest {
+class TokenServiceTest {
     @InjectMocks
     private TokenService tokenService;
 

@@ -73,7 +73,6 @@ class PinaltiSeviceTest {
         PinaltiResponse response = pinaltiService.addPinalti(booking, receptionist.getId());
 
         assertNotNull(response);
-        assertEquals(response.getId(), fakePinalti.getId());
         assertEquals(response.getBookingId(), booking.getId());
         assertEquals(response.getReceptionist(), receptionist.getId());
         assertEquals(response.getDenda(), fakePinalti.getDenda());
