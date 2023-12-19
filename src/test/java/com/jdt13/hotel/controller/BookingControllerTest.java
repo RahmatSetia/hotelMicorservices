@@ -1,6 +1,8 @@
 package com.jdt13.hotel.controller;
 
+import com.jdt13.hotel.dto.BookingRequest;
 import com.jdt13.hotel.dto.BookingResponse;
+import com.jdt13.hotel.dto.ReportRequest;
 import com.jdt13.hotel.entity.Booking;
 import com.jdt13.hotel.exception.ApiRequestException;
 import com.jdt13.hotel.service.BookingService;
@@ -12,7 +14,9 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -121,6 +125,138 @@ class BookingControllerTest {
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(responseEntity.getBody().getId(), id);
+    }
+
+
+    @Test
+    void testReport(){
+        Date start = new Date(2023,12,1);
+        Date end = new Date(2023,12,30);
+
+        Date checkin = new Date(2023,12,2);
+        Date checkout = new Date(2023,12,3);
+
+        Date checkin1 = new Date(2023,12,4);
+        Date checkout1 = new Date(2023,12,5);
+
+        ReportRequest request = new ReportRequest();
+        request.setStartDay(start);
+        request.setEndDay(end);
+
+        BookingResponse response = new BookingResponse();
+        response.setId(1);
+        response.setCustomerId(2);
+        response.setKamarId(2);
+        response.setCheckin(checkin);
+        response.setCheckout(checkout);
+        response.setTotalHarga(BigDecimal.valueOf(200000));
+        response.setStatusBooking(true);
+
+        BookingResponse response2 = new BookingResponse();
+        response2.setId(1);
+        response2.setCustomerId(2);
+        response2.setKamarId(2);
+        response2.setCheckin(checkin1);
+        response2.setCheckout(checkout1);
+        response2.setTotalHarga(BigDecimal.valueOf(200000));
+        response2.setStatusBooking(true);
+
+        List<BookingResponse> responseList = new ArrayList<>();
+        responseList.add(response);
+        responseList.add(response2);
+
+        when(bookingService.reportByMonth(request)).thenReturn(responseList);
+        ResponseEntity<List<BookingResponse>> test = bookingController.report(request);
+
+        assertEquals(HttpStatus.OK, test.getStatusCode());
+        assertEquals(test.getBody(), responseList);
+    }
+
+    @Test
+    void testAddBooking(){
+        String token = "token";
+
+        Date checkin = new Date(2023,12,2);
+        Date checkout = new Date(2023,12,3);
+
+        BookingRequest request = new BookingRequest();
+        request.setCustomerId(2);
+        request.setKamarId(32);
+        request.setCheckin(checkin);
+        request.setCheckout(checkout);
+
+        BookingResponse bookingResponse = new BookingResponse();
+        bookingResponse.setId(2);
+        bookingResponse.setKamarId(32);
+        bookingResponse.setCustomerId(2);
+        bookingResponse.setCheckin(checkin);
+        bookingResponse.setCheckout(checkout);
+        bookingResponse.setTotalHarga(BigDecimal.valueOf(200000));
+        bookingResponse.setStatusBooking(true);
+
+        when(bookingService.addBooking(token, request)).thenReturn(bookingResponse);
+        ResponseEntity<BookingResponse> response = bookingController.addBooking(token, request);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(bookingResponse, response.getBody());
+    }
+
+    @Test
+    void testChekin(){
+        Integer id = 2;
+        String token = "tokenReceptionist";
+
+        Date checkin = new Date(2023,12,2);
+        Date checkout = new Date(2023,12,3);
+
+        BookingRequest request = new BookingRequest();
+        request.setCustomerId(2);
+        request.setKamarId(32);
+        request.setCheckin(checkin);
+        request.setCheckout(checkout);
+
+        BookingResponse bookingResponse = new BookingResponse();
+        bookingResponse.setId(2);
+        bookingResponse.setKamarId(32);
+        bookingResponse.setCustomerId(2);
+        bookingResponse.setCheckin(checkin);
+        bookingResponse.setCheckout(checkout);
+        bookingResponse.setTotalHarga(BigDecimal.valueOf(200000));
+        bookingResponse.setStatusBooking(true);
+        when(bookingService.checkinBooking(id, token)).thenReturn(bookingResponse);
+        ResponseEntity<BookingResponse> responseEntity = bookingController.checkin(id, token);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(bookingResponse, responseEntity.getBody());
+    }
+
+    @Test
+    void testChekout(){
+        Integer id = 2;
+        String token = "tokenReceptionist";
+
+        Date checkin = new Date(2023,12,2);
+        Date checkout = new Date(2023,12,3);
+
+        BookingRequest request = new BookingRequest();
+        request.setCustomerId(2);
+        request.setKamarId(32);
+        request.setCheckin(checkin);
+        request.setCheckout(checkout);
+
+        BookingResponse bookingResponse = new BookingResponse();
+        bookingResponse.setId(2);
+        bookingResponse.setKamarId(32);
+        bookingResponse.setCustomerId(2);
+        bookingResponse.setCheckin(checkin);
+        bookingResponse.setCheckout(checkout);
+        bookingResponse.setTotalHarga(BigDecimal.valueOf(200000));
+        bookingResponse.setStatusBooking(true);
+        when(bookingService.checkoutBooking(id, token)).thenReturn(bookingResponse);
+        ResponseEntity<BookingResponse> responseEntity = bookingController.checkout(id, token);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(bookingResponse, responseEntity.getBody());
     }
 
     @Test
