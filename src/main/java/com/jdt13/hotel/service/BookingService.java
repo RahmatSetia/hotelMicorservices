@@ -69,7 +69,7 @@ public class BookingService {
         return booking.stream().map(this::mapToBookingResponse).toList();
     }
 
-    public List<BookingResponse> getAllBooking (){
+    public List<BookingResponse>    getAllBooking (){
         List<Booking> allBooking = bookingRepository.findAll();
         return allBooking.stream().map(this::mapToBookingResponse).toList();
     }

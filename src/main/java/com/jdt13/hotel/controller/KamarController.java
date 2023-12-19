@@ -28,7 +28,7 @@ public class KamarController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Kamar>> getAllKamar(@Valid @RequestBody KamarCheckinRequest request){
+    public ResponseEntity<List<Kamar>> getKamar(@Valid @RequestBody KamarCheckinRequest request){
         List<Kamar> kamars = kamarService.getAllKamarBeforeBooking(request);
         return new ResponseEntity<>(kamars, HttpStatus.OK);
     }
