@@ -38,6 +38,11 @@ public class PinaltiService {
         return mapToPinaltiResponse(pinalti);
     }
 
+    public List<PinaltiResponse> getAllPinalti(){
+        List<Pinalti> pinalti = pinaltiRepository.findAll();
+        return pinalti.stream().map(this::mapToPinaltiResponse).toList();
+    }
+
     public PinaltiResponse getById (Integer id){
         Pinalti pinalti = pinaltiRepository.findById(id).orElseThrow(()->new ApiExceptionNotFound("Id pinalti tidak di temukan"));
         return mapToPinaltiResponse(pinalti);
