@@ -30,7 +30,7 @@ public class KamarService {
         return kamars.stream().map(this::toResponseKamar).toList();
     }
 
-    public KamarResponse saveKamar(KamarRequest request){
+    public KamarResponse    saveKamar(KamarRequest request){
         Kamar kamar = new Kamar();
         kamar.setNoKamar(request.getNoKamar());
         kamar.setHarga(request.getHarga());

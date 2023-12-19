@@ -90,4 +90,13 @@ class KamarControllerTest {
         assertEquals(HttpStatus.CREATED, resController.getStatusCode());
         assertEquals(resController.getBody(), response);
     }
+
+    @Test
+    void testDeleteKamarById(){
+        Integer id = 1;
+        String response = "berhasil delete Kamar dengan idBooking = " + id;
+        when(kamarService.deleteKamarIdKamar(id)).thenReturn(response);
+        ResponseEntity<KamarResponse> responseEntity = kamarController.deleteKamarById(id);
+        assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
+    }
 }
