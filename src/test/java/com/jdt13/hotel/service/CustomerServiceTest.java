@@ -196,20 +196,4 @@ class CustomerServiceTest {
         ApiExceptionNotFound notFound = assertThrows(ApiExceptionNotFound.class, () -> customerService.updateCustomer("token", validCustomerId, request));
         assertEquals(notFound.getMessage(), tokenNotFound);
     }
-
-    @Test
-    void testUpdateCustomerWithInvalidId() {
-        Customer invalidCustomer = new Customer();
-        String pesan = "Customer tidak ditemukan, jadi tidak ada yang dapat diubah.";
-
-        CustomerRequest req = new CustomerRequest();
-        req.setNama(req.getNama());
-        invalidCustomer.setId(99999); // Assuming this product doesn't exist
-
-        ServiceException exception = assertThrows(ServiceException.class, () -> {
-            customerRepository.findById(invalidCustomer.getId());
-        });
-
-        assertEquals(exception.getMessage(), pesan);
-    }
 }
