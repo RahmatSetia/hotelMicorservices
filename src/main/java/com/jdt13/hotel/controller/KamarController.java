@@ -24,7 +24,6 @@ public class KamarController {
         List<KamarResponse> kamars = kamarService.getAllKamar(token);
         return new ResponseEntity<>(kamars, HttpStatus.OK);
     }
-
     //saveKamar
     @PostMapping
     public ResponseEntity<KamarResponse> postKamar(@Valid @RequestBody KamarRequest request){
