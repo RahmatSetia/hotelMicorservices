@@ -45,6 +45,7 @@ public class PinaltiService {
 
     public List<PinaltiResponse> getByBookingId (Integer idBooking){
         List<Pinalti> pinalti = pinaltiRepository.bookingId(idBooking);
+        if (pinalti.isEmpty()){throw new ApiExceptionNotFound("Id Booking tidak di temukan");}
         return pinalti.stream().map(this::mapToPinaltiResponse).toList();
     }
     private PinaltiResponse mapToPinaltiResponse(Pinalti pinalti){
