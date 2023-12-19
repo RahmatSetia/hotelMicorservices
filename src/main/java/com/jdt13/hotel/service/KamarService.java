@@ -1,6 +1,5 @@
 package com.jdt13.hotel.service;
 
-import com.jdt13.hotel.dto.KamarCheckinRequest;
 import com.jdt13.hotel.dto.KamarRequest;
 import com.jdt13.hotel.dto.KamarResponse;
 import com.jdt13.hotel.entity.Kamar;
@@ -24,10 +23,6 @@ public class KamarService {
     private String pesan = "Kamar tidak di temukan";
     private String tokenNotFound = "Anda belum login";
 
-    public List<Kamar> getAllKamarBeforeBooking (KamarCheckinRequest kamarCheckinRequest){
-        return kamarRepository.findKamarBeforeBookingInCheckinCheckout();
-    }
-
     public List<KamarResponse> getAllKamar (String token){
         if (!tokenService.getToken(token)){throw new ApiExceptionUnauthorized(tokenNotFound);}
         List<Kamar> kamars = kamarRepository.findAll();
@@ -35,7 +30,7 @@ public class KamarService {
         return kamars.stream().map(this::toResponseKamar).toList();
     }
 
-    public KamarResponse saveKamar(KamarRequest request){
+    public KamarResponse    saveKamar(KamarRequest request){
         Kamar kamar = new Kamar();
         kamar.setNoKamar(request.getNoKamar());
         kamar.setHarga(request.getHarga());

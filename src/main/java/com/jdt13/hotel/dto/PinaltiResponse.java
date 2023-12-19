@@ -1,6 +1,5 @@
 package com.jdt13.hotel.dto;
 
-import com.jdt13.hotel.entity.Receptionist;
 import lombok.Data;
 
 import java.math.BigDecimal;

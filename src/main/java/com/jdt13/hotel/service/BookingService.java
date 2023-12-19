@@ -69,7 +69,7 @@ public class BookingService {
         return booking.stream().map(this::mapToBookingResponse).toList();
     }
 
-    public List<BookingResponse> getAllBooking (){
+    public List<BookingResponse>    getAllBooking (){
         List<Booking> allBooking = bookingRepository.findAll();
         return allBooking.stream().map(this::mapToBookingResponse).toList();
     }
@@ -106,7 +106,6 @@ public class BookingService {
     public BookingResponse checkoutBooking (Integer id, String tokenRecep){
         if (!tokenService.getTokenReceptionist(tokenRecep)){throw new ApiExceptionUnauthorized(tokenNotFound);}
         Receptionist receptionist = receptionistRepository.findByToken(tokenRecep).orElseThrow(() -> new ApiExceptionUnauthorized(tokenNotFound));
-//        if (receptionistRepository.findByToken(tokenRecep).isEmpty()){throw new ApiExceptionUnauthorized(tokenNotFound);}
         //set jam 1
         Optional<Booking> booking = bookingRepository.findById(id);
         if (booking.isEmpty()){throw new ApiExceptionNotFound(pesan);}

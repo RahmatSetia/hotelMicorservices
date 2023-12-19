@@ -1,9 +1,7 @@
 package com.jdt13.hotel.controller;
 
-import com.jdt13.hotel.dto.KamarCheckinRequest;
 import com.jdt13.hotel.dto.KamarRequest;
 import com.jdt13.hotel.dto.KamarResponse;
-import com.jdt13.hotel.entity.Kamar;
 import com.jdt13.hotel.service.KamarService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +22,6 @@ public class KamarController {
     @GetMapping("/all")
     public ResponseEntity<List<KamarResponse>> getAllKamar(@RequestHeader String token){
         List<KamarResponse> kamars = kamarService.getAllKamar(token);
-        return new ResponseEntity<>(kamars, HttpStatus.OK);
-    }
-
-    @GetMapping
-    public ResponseEntity<List<Kamar>> getAllKamar(@Valid @RequestBody KamarCheckinRequest request){
-        List<Kamar> kamars = kamarService.getAllKamarBeforeBooking(request);
         return new ResponseEntity<>(kamars, HttpStatus.OK);
     }
     //saveKamar
