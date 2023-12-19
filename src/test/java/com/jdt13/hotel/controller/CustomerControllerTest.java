@@ -20,11 +20,11 @@ import static org.mockito.Mockito.*;
 
 class CustomerControllerTest {
 
-    @Mock
-    private CustomerService customerService;
-
     @InjectMocks
     private CustomerController customerController;
+
+    @Mock
+    private CustomerService customerService;
 
     @BeforeEach
     void setUp() {
@@ -34,12 +34,13 @@ class CustomerControllerTest {
     @Test
     void testGetCustomerById() {
         // Arrange
+        String token = "token 1";
         int customerId = 1;
         CustomerResponse mockCustomer = new CustomerResponse();
-        when(customerService.findCustomerById(customerId)).thenReturn(mockCustomer);
+        when(customerService.findCustomerById(customerId, token)).thenReturn(mockCustomer);
 
         // Act
-        ResponseEntity<Customer> responseEntity = customerController.getCustomerById(customerId);
+        ResponseEntity<CustomerResponse> responseEntity = customerController.getCustomerById(token, customerId);
 
         // Assert
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
