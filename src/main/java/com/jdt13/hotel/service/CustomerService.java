@@ -69,12 +69,14 @@ public class CustomerService {
         return toCustomerResponse(c);
     }
 
-    public void deleteCustomerById (Integer id){
+    public String deleteCustomerById (Integer id){
+        String pesan = "berhasil delete Booking dengan idBooking = " + id;
         Optional<Customer> customer = customerRepository.findById(id);
         if (customer.isEmpty()){
             throw new ApiRequestException(idNotFound);
         }
         customerRepository.deleteById(id);
+        return pesan;
     }
 
     private CustomerResponse toCustomerResponse(Customer customer){
