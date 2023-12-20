@@ -1,9 +1,8 @@
 package com.jdt13.hotel.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.FutureOrPresent;
 import lombok.Data;
-
+import jakarta.validation.constraints.FutureOrPresent;
 import java.util.Date;
 
 @Data

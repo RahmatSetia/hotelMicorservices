@@ -8,6 +8,8 @@ import com.jdt13.hotel.util.Jwt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class CustomerService {
@@ -28,14 +30,18 @@ public class CustomerService {
     }
 
     public LoginResponse login (LoginRequest request){
-        Customer customer = customerRepository.findByUsernameAndPassword(request.getUsername(), request.getPassword()).orElseThrow(()-> new ApiExceptionNotFound(idNotFound));
+//        Customer customer = customerRepository.findByUsernameAndPassword(request.getUsername(), request.getPassword()).orElseThrow(()-> new ApiExceptionNotFound(idNotFound));
+        Optional<Customer> customer = customerRepository.findByUsernameAndPassword(request.getUsername(), request.getPassword());
+        if (customer.isEmpty()){
+            throw new ApiExceptionNotFound(idNotFound);
+        }
         Customer c = new Customer();
-        c.setId(customer.getId());
-        c.setNama(customer.getNama());
-        c.setUsername(customer.getUsername());
-        c.setPassword(customer.getPassword());
-        c.setAlamat(customer.getAlamat());
-        c.setPhone(customer.getPhone());
+        c.setId(customer.get().getId());
+        c.setNama(customer.get().getNama());
+        c.setUsername(customer.get().getUsername());
+        c.setPassword(customer.get().getPassword());
+        c.setAlamat(customer.get().getAlamat());
+        c.setPhone(customer.get().getPhone());
         c.setToken(Jwt.getToken(request));
         customerRepository.save(c);
 
