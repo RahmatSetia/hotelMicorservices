@@ -3,13 +3,10 @@ package com.jdt13.hotel.service;
 import com.jdt13.hotel.dto.*;
 import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.exception.ApiExceptionNotFound;
-import com.jdt13.hotel.exception.ApiRequestException;
 import com.jdt13.hotel.repository.CustomerRepository;
 import com.jdt13.hotel.util.Jwt;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -70,12 +67,9 @@ public class CustomerService {
     }
 
     public String deleteCustomerById (Integer id){
-        String pesan = "berhasil delete Booking dengan idBooking = " + id;
-        Optional<Customer> customer = customerRepository.findById(id);
-        if (customer.isEmpty()){
-            throw new ApiRequestException(idNotFound);
-        }
-        customerRepository.deleteById(id);
+        String pesan = "berhasil delete Customer dengan id = " + id;
+        Customer customer = customerRepository.findById(id).orElseThrow(() -> new ApiExceptionNotFound(idNotFound));
+        customerRepository.delete(customer);
         return pesan;
     }
 

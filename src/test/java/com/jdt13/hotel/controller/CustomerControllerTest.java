@@ -2,6 +2,8 @@ package com.jdt13.hotel.controller;
 
 import com.jdt13.hotel.dto.CustomerRequest;
 import com.jdt13.hotel.dto.CustomerResponse;
+import com.jdt13.hotel.dto.LoginRequest;
+import com.jdt13.hotel.dto.LoginResponse;
 import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.service.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,7 +87,21 @@ class CustomerControllerTest {
         verify(customerService, times(1)).registerCustomer(request);
     }
 
-    //login
+    @Test
+    void testLogin(){
+        Integer id = 23;
+        String token = "token";
+        LoginRequest request = new LoginRequest();
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setId(id);
+        loginResponse.setToken(token);
+        when(customerService.login(request)).thenReturn(loginResponse);
+
+        ResponseEntity<LoginResponse> response = customerController.login(request);
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(loginResponse, response.getBody());
+    }
 
     @Test
     void testUpdateCustomerById(){
