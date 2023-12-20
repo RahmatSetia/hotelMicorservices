@@ -2,6 +2,7 @@ package com.jdt13.hotel.controller;
 
 import com.jdt13.hotel.dto.CustomerRequest;
 import com.jdt13.hotel.dto.CustomerResponse;
+import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.service.CustomerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import static org.mockito.Mockito.when;
@@ -82,5 +83,55 @@ class CustomerControllerTest {
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
         assertEquals(response, responseEntity.getBody());
         verify(customerService, times(1)).registerCustomer(request);
+    }
+
+    //login
+
+    @Test
+    void testUpdateCustomerById(){
+        String token = "token";
+        Integer id = 23;
+        Customer customer = new Customer();
+        customer.setId(id);
+        customer.setNama("awang");
+        customer.setUsername("awang");
+        customer.setPassword("awang");
+        customer.setAlamat("Sidareja");
+        customer.setPhone("0895339042072");
+        customer.setToken(token);
+
+        CustomerRequest request = new CustomerRequest();
+        request.setNama("awang update");
+        request.setUsername("awang Update");
+        request.setPassword("awang Update");
+        request.setAlamat("Sidareja Update");
+        request.setPhone("0895339040000");
+
+        CustomerResponse response = new CustomerResponse();
+        response.setId(id);
+        response.setNama(request.getNama());
+        response.setUsername(request.getUsername());
+        response.setPassword(request.getPassword());
+        response.setAlamat(request.getAlamat());
+        response.setPhone(request.getPhone());
+        when(customerService.updateCustomer(token, id, request)).thenReturn(response);
+        ResponseEntity<CustomerResponse> responseEntity = customerController.updateCustomerById(token, id, request);
+
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(response, responseEntity.getBody());
+    }
+
+    @Test
+    void testDeleteById(){
+        Integer id = 32;
+        String response = "berhasil delete Customer dengan id = " + id;
+        when(customerService.deleteCustomerById(id)).thenReturn(response);
+
+        ResponseEntity<String> responseEntity = customerController.deleteById(id);
+
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
+        assertEquals(response, responseEntity.getBody());
     }
 }
