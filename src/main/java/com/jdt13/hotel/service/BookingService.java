@@ -65,11 +65,11 @@ public class BookingService {
     //reportBookingByCustomerId
     public List<BookingResponse> getBookingByCustomerId (Integer id){
         List<Booking> booking = bookingRepository.customerId(id);
-        if (booking.isEmpty()){throw new ApiExceptionNotFound(pesanCustomer);}
+        if (booking.isEmpty()){throw new ApiExceptionNotFound(pesan);}
         return booking.stream().map(this::mapToBookingResponse).toList();
     }
 
-    public List<BookingResponse>    getAllBooking (){
+    public List<BookingResponse> getAllBooking (){
         List<Booking> allBooking = bookingRepository.findAll();
         return allBooking.stream().map(this::mapToBookingResponse).toList();
     }
@@ -86,17 +86,16 @@ public class BookingService {
     public BookingResponse checkinBooking (Integer id, String tokenRecep){
         if (!tokenService.getTokenReceptionist(tokenRecep)){throw new ApiExceptionUnauthorized(tokenNotFound);}
 
-        Optional<Booking> booking = bookingRepository.findById(id);
-        if (booking.isEmpty()){throw new ApiRequestException(pesan);}
-        if (booking.get().getStatusBooking().booleanValue()){throw new ApiRequestException("Booking status sudah true");}
+        Booking booking = bookingRepository.findById(id).orElseThrow(() -> new ApiRequestException(pesan));
+        if (booking.getStatusBooking().booleanValue()){throw new ApiRequestException("Booking status sudah true");}
         Booking book = new Booking();
         book.setId(id);
-        book.setCustomer(booking.get().getCustomer());
-        book.setKamar(booking.get().getKamar());
-        book.setCheckin(booking.get().getCheckin());
-        book.setCheckout(booking.get().getCheckout());
-        book.setTanggalBooking(booking.get().getTanggalBooking());
-        book.setTotalHarga(booking.get().getTotalHarga());
+        book.setCustomer(booking.getCustomer());
+        book.setKamar(booking.getKamar());
+        book.setCheckin(booking.getCheckin());
+        book.setCheckout(booking.getCheckout());
+        book.setTanggalBooking(booking.getTanggalBooking());
+        book.setTotalHarga(booking.getTotalHarga());
         book.setStatusBooking(true);
         bookingRepository.save(book);
         return mapToBookingResponse(book);
@@ -107,19 +106,18 @@ public class BookingService {
         if (!tokenService.getTokenReceptionist(tokenRecep)){throw new ApiExceptionUnauthorized(tokenNotFound);}
         Receptionist receptionist = receptionistRepository.findByToken(tokenRecep).orElseThrow(() -> new ApiExceptionUnauthorized(tokenNotFound));
         //set jam 1
-        Optional<Booking> booking = bookingRepository.findById(id);
-        if (booking.isEmpty()){throw new ApiExceptionNotFound(pesan);}
+        Booking booking = bookingRepository.findById(id).orElseThrow(() -> new ApiExceptionNotFound(pesan));
         Booking book = new Booking();
         book.setId(id);
-        book.setCustomer(booking.get().getCustomer());
-        book.setKamar(booking.get().getKamar());
-        book.setCheckin(booking.get().getCheckin());
-        book.setCheckout(booking.get().getCheckout());
-        book.setTanggalBooking(booking.get().getTanggalBooking());
-        book.setTotalHarga(booking.get().getTotalHarga());
+        book.setCustomer(booking.getCustomer());
+        book.setKamar(booking.getKamar());
+        book.setCheckin(booking.getCheckin());
+        book.setCheckout(booking.getCheckout());
+        book.setTanggalBooking(booking.getTanggalBooking());
+        book.setTotalHarga(booking.getTotalHarga());
         book.setStatusBooking(null);
         bookingRepository.save(book);
-        pinaltiService.addPinalti(booking.get(), receptionist.getId());
+        pinaltiService.addPinalti(booking, receptionist.getId());
         return mapToBookingResponse(book);
     }
 
