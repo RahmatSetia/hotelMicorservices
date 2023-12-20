@@ -7,7 +7,6 @@ import com.jdt13.hotel.dto.LoginResponse;
 import com.jdt13.hotel.entity.Customer;
 import com.jdt13.hotel.exception.ApiExceptionNotFound;
 import com.jdt13.hotel.repository.CustomerRepository;
-import org.hibernate.service.spi.ServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -195,5 +194,31 @@ class CustomerServiceTest {
         when(tokenService.getToken(any())).thenReturn(false);
         ApiExceptionNotFound notFound = assertThrows(ApiExceptionNotFound.class, () -> customerService.updateCustomer("token", validCustomerId, request));
         assertEquals(notFound.getMessage(), tokenNotFound);
+    }
+
+    @Test
+    void testDeleteCustomerById_WillReturnMessage(){
+        Integer id = 23;
+        String pesan = "berhasil delete Customer dengan id = " + id;
+        Customer cust = new Customer();
+        cust.setId(id);
+        cust.setNama("awang");
+        cust.setUsername("awang");
+        cust.setPassword("password");
+        cust.setAlamat("sidareja");
+        cust.setPhone("0895339042072");
+        when(customerRepository.findById(id)).thenReturn(Optional.of(cust));
+        String delet = customerService.deleteCustomerById(id);
+        assertNotNull(delet);
+        assertEquals(pesan, delet);
+    }
+
+    @Test
+    void testDeleteCustomerWithValidId_WillReturnApiExcNotFound() {
+        Integer id = 12345;
+        String idNotFound = "Customer tidak di temukan";
+        when(customerRepository.findById(id)).thenReturn(Optional.empty());
+        ApiExceptionNotFound notFound = assertThrows(ApiExceptionNotFound.class, () -> customerService.deleteCustomerById(id));
+        assertEquals(notFound.getMessage(), idNotFound);
     }
 }
