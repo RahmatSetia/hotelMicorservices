@@ -1,6 +1,5 @@
 package com.jdt13.hotel.dto;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import jakarta.validation.constraints.NotBlank;
