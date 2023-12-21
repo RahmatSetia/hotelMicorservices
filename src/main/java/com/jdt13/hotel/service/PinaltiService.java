@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 
@@ -26,14 +27,19 @@ public class PinaltiService {
     private final KamarRepository kamarRepository;
 
     public PinaltiResponse addPinalti (Booking booking, Integer recep){
-        Date now = new Date();
+        LocalTime now = LocalTime.now();
+        LocalTime batas = LocalTime.of(13, 0);
         Receptionist receptionist = receptionistRepository.findById(recep).orElseThrow(() -> new ApiExceptionNotFound("Id Receptionist tidak di temukan"));
         Kamar kamar = kamarRepository.findById(booking.getKamar().getId()).orElseThrow(() -> new ApiExceptionNotFound("Id Kamar tidak di temukan"));
+        BigDecimal harga = kamar.getHarga();
+        if (now.isAfter(batas)){
+            harga = kamar.getHarga().multiply(BigDecimal.valueOf(1.5));
+        }
         Pinalti pinalti = new Pinalti();
         pinalti.setBooking(booking);
-        pinalti.setDateCheckout(now);
+        pinalti.setDateCheckout(new Date());
         pinalti.setReceptionist(receptionist);
-        pinalti.setDenda(kamar.getHarga().multiply(BigDecimal.valueOf(1.5)));
+        pinalti.setDenda(harga);
         pinaltiRepository.save(pinalti);
         return mapToPinaltiResponse(pinalti);
     }
